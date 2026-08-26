@@ -32,11 +32,11 @@ keywords = [
 ]
 
 [project.urls]
-Homepage = 'https://github.com/coltonbh/qcconst'
-Documentation = 'https://github.com/coltonbh/qcconst#readme'
-Source = 'https://github.com/coltonbh/qcconst'
-Changelog = 'https://github.com/coltonbh/qcconst/blob/master/CHANGELOG.md'
-"Bug Tracker" = 'https://github.com/coltonbh/qcconst/issues'
+Homepage = 'https://github.com/atomsforhumanity/qcconst'
+Documentation = 'https://github.com/atomsforhumanity/qcconst#readme'
+Source = 'https://github.com/atomsforhumanity/qcconst'
+Changelog = 'https://github.com/atomsforhumanity/qcconst/blob/master/CHANGELOG.md'
+"Bug Tracker" = 'https://github.com/atomsforhumanity/qcconst/issues'
 
 [dependency-groups]
 dev = [

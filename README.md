@@ -3,8 +3,8 @@
 [![image](https://img.shields.io/pypi/v/qcconst.svg)](https://pypi.python.org/pypi/qcconst)
 [![image](https://img.shields.io/pypi/l/qcconst.svg)](https://pypi.python.org/pypi/qcconst)
 [![image](https://img.shields.io/pypi/pyversions/qcconst.svg)](https://pypi.python.org/pypi/qcconst)
-[![Actions status](https://github.com/coltonbh/qcconst/workflows/Tests/badge.svg)](https://github.com/coltonbh/qcconst/actions)
-[![Actions status](https://github.com/coltonbh/qcconst/workflows/Basic%20Code%20Quality/badge.svg)](https://github.com/coltonbh/qcconst/actions)
+[![Actions status](https://github.com/atomsforhumanity/qcconst/workflows/Tests/badge.svg)](https://github.com/atomsforhumanity/qcconst/actions)
+[![Actions status](https://github.com/atomsforhumanity/qcconst/workflows/Basic%20Code%20Quality/badge.svg)](https://github.com/atomsforhumanity/qcconst/actions)
 
 Physical constants, conversion factors, and a periodic table with clear source information for every value. Data from NIST CODATA 2022, Pubchem, and Washington University. All data in atomic units (e.g., length in Bohr).
 
@@ -170,14 +170,16 @@ bromobenzene                     5.17  ['https://depts.washington.edu/eooptic/li
 
 ## Adding New Values
 
-Adding new values is simple! Just add it to one of the `.csv` files in [src/qcconst/data](https://github.com/coltonbh/qcconst/tree/master/src/qcconst/data). Include the value, its source, and any other required metadata and then open a PR. That's it! ✨
+Adding new values is simple! Just add it to one of the `.csv` files in [src/qcconst/data](https://github.com/atomsforhumanity/qcconst/tree/master/src/qcconst/data). Include the value, its source, and any other required metadata and then open a PR. That's it! ✨
 
 ## The QC Suite of Programs
 
-If you like `qcconst` you may like my other libraries for computational chemistry.
+The QC Suite works in harmony to provide fast, structured, and interoperable quantum chemistry tools.
 
-- [qcio](https://github.com/coltonbh/qcio) - Elegant and intuitive data structures for quantum chemistry, featuring seamless Jupyter Notebook visualizations. [Documentation](https://qcio.coltonhicks.com)
-- [qccodec](https://github.com/coltonbh/qccodec) - A library for parsing Quantum Chemistry output files into structured data objects and converting structured input objects into program-native input files. Uses data structures from `qcio`.
-- [qcop](https://github.com/coltonbh/qcop) - A package for operating quantum chemistry programs using `qcio` standardized data structures. Compatible with `TeraChem`, `psi4`, `QChem`, `NWChem`, `ORCA`, `Molpro`, `geomeTRIC` and many more.
+- [qcconst](https://github.com/atomsforhumanity/qcconst) - Physical constants, conversion factors, and a periodic table with clear source information for every value.
+- [qcdata](https://github.com/atomsforhumanity/qcdata) - Elegant and intuitive data structures for quantum chemistry, featuring seamless Jupyter Notebook visualizations. [Documentation](https://qcdata.docs.atomsforhumanity.org)
+- [qcinf](https://github.com/atomsforhumanity/qcinf) - Cheminformatics algorithms and structure utilities using standardized [qcdata](https://qcdata.docs.atomsforhumanity.org/) data structures.
+- [qccodec](https://github.com/atomsforhumanity/qccodec) - A package for translating between standardized [qcdata](https://github.com/atomsforhumanity/qcdata) data structures and native QC program inputs and outputs.
+- [qccompute](https://github.com/atomsforhumanity/qccompute) - A package for operating quantum chemistry programs using standardized [qcdata](https://qcdata.docs.atomsforhumanity.org/) data structures. Compatible with `TeraChem`, `psi4`, `QChem`, `NWChem`, `ORCA`, `Molpro`, `geomeTRIC` and many more.
 - [BigChem](https://github.com/mtzgroup/bigchem) - A distributed application for running quantum chemistry calculations at scale across clusters of computers or the cloud. Bring multi-node scaling to your favorite quantum chemistry program.
 - `ChemCloud` - A [web application](https://github.com/mtzgroup/chemcloud-server) and associated [Python client](https://github.com/mtzgroup/chemcloud-client) for exposing a BigChem cluster securely over the internet.
