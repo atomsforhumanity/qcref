@@ -1,6 +1,6 @@
 [project]
 name = "qcconst"
-version = "0.2.1"
+version = "0.2.2"
 description = "Physical constants, conversion factors, and a periodic table with clear source information for every value."
 readme = "README.md"
 authors = [{ name = "Colton Hicks", email = "github@coltonhicks.com" }]
