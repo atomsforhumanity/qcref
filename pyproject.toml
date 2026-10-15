@@ -1,17 +1,16 @@
 [project]
-name = "qcconst"
+name = "qcref"
 version = "0.2.2"
-description = "Physical constants, conversion factors, and a periodic table with clear source information for every value."
+description = "Lightweight, dependency-free chemistry reference data (CODATA constants, periodic table, solvents) where every value carries its source."
 readme = "README.md"
 authors = [{ name = "Colton Hicks", email = "github@coltonhicks.com" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = []
 license = { file = "LICENSE" }
 
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Development Status :: 4 - Beta",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -23,6 +22,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 keywords = [
+    "reference data",
     "constants",
     "periodic table",
     "scientific computing",
@@ -32,11 +32,11 @@ keywords = [
 ]
 
 [project.urls]
-Homepage = 'https://github.com/atomsforhumanity/qcconst'
-Documentation = 'https://github.com/atomsforhumanity/qcconst#readme'
-Source = 'https://github.com/atomsforhumanity/qcconst'
-Changelog = 'https://github.com/atomsforhumanity/qcconst/blob/master/CHANGELOG.md'
-"Bug Tracker" = 'https://github.com/atomsforhumanity/qcconst/issues'
+Homepage = 'https://github.com/atomsforhumanity/qcref'
+Documentation = 'https://github.com/atomsforhumanity/qcref#readme'
+Source = 'https://github.com/atomsforhumanity/qcref'
+Changelog = 'https://github.com/atomsforhumanity/qcref/blob/master/CHANGELOG.md'
+"Bug Tracker" = 'https://github.com/atomsforhumanity/qcref/issues'
 
 [dependency-groups]
 dev = [
@@ -59,18 +59,20 @@ path = "build_tools/build_hook.py"
 [tool.ruff]
 exclude = [".venv"]
 line-length = 88
-target-version = "py39"
+target-version = "py310"
 
 [tool.coverage.run]
 branch = true
-source = ["qcconst"]
+source = ["qcref"]
 
 [tool.coverage.report]
 show_missing = true
 
 [tool.ruff.lint]
-isort = { known-first-party = ["qcconst", "tests"] }
+isort = { known-first-party = ["qcref", "tests"] }
 select = ["I", "F401"]
 
 [tool.mypy]
 ignore_missing_imports = true
+[tool.hatch.build.targets.sdist]
+exclude = ["compat", "*.pdf"]

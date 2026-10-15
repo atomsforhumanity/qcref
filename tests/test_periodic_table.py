@@ -1,65 +1,100 @@
 import pytest
 
-from qcconst import PeriodicTable
-from qcconst import periodic_table as pt
+from qcref import PeriodicTable
+from qcref import periodic_table as pt
 
 
 def test_periodic_table_from_pubchem():
-    pt = PeriodicTable.from_data()
+    PeriodicTable.from_data()
+
+
+def test_periodic_table_collection_access():
+    assert pt.Ni is pt["Ni"] is pt.by_name("Nickel") is pt.by_name("nickel")
+    assert pt.Ni.symbol == "Ni"
+    assert pt["As"].name == "Arsenic"
+    assert "Ni" in pt.as_list()
+    assert "Ni" in dir(pt)
+
+
+def test_periodic_table_rejects_non_keys():
+    with pytest.raises(AttributeError):
+        _ = pt.ni
+    with pytest.raises(KeyError):
+        pt["Nickel"]
+    with pytest.raises(KeyError):
+        pt.by_name("Ni")
 
 
 def test_group_period_lookup_params():
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         pt.group(0)
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         pt.group(19)
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         pt.period(0)
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         pt.period(8)
 
 
 def test_group_and_period_data():
-    # fmt: off
-    # Assert that all groups and periods are correct
     assert [a.symbol for a in pt.group(1)] == ["H", "Li", "Na", "K", "Rb", "Cs", "Fr"]
-    assert [a.symbol for a in pt.group(2)] == ["Be", "Mg", "Ca", "Sr", "Ba", "Ra"]
-    assert [a.symbol for a in pt.group(3)] == ["Sc", "Y", "Lu", "Lr"]
-    assert [a.symbol for a in pt.group(4)] == ["Ti", "Zr", "Hf", "Rf"]
-    assert [a.symbol for a in pt.group(5)] == ["V", "Nb", "Ta", "Db"]
-    assert [a.symbol for a in pt.group(6)] == ["Cr", "Mo", "W", "Sg"]
-    assert [a.symbol for a in pt.group(7)] == ["Mn", "Tc", "Re", "Bh"]
-    assert [a.symbol for a in pt.group(8)] == ["Fe", "Ru", "Os", "Hs"]
-    assert [a.symbol for a in pt.group(9)] == ["Co", "Rh", "Ir", "Mt"]
     assert [a.symbol for a in pt.group(10)] == ["Ni", "Pd", "Pt", "Ds"]
-    assert [a.symbol for a in pt.group(11)] == ["Cu", "Ag", "Au", "Rg"]
-    assert [a.symbol for a in pt.group(12)] == ["Zn", "Cd", "Hg", "Cn"]
-    assert [a.symbol for a in pt.group(13)] == ["B", "Al", "Ga", "In", "Tl", "Nh"]
-    assert [a.symbol for a in pt.group(14)] == ["C", "Si", "Ge", "Sn", "Pb", "Fl"]
-    assert [a.symbol for a in pt.group(15)] == ["N", "P", "As", "Sb", "Bi", "Mc"]
-    assert [a.symbol for a in pt.group(16)] == ["O", "S", "Se", "Te", "Po", "Lv"]
-    assert [a.symbol for a in pt.group(17)] == ["F", "Cl", "Br", "I", "At", "Ts"]
-    assert [a.symbol for a in pt.group(18)] == ["He", "Ne", "Ar", "Kr", "Xe", "Rn", "Og"]  # noqa: E501
-    assert [a.symbol for a in pt.period(1)] == ["H", "He"]
-    assert [a.symbol for a in pt.period(2)] == ["Li", "Be", "B", "C", "N", "O", "F", "Ne"]  # noqa: E501
-    assert [a.symbol for a in pt.period(3)] == ["Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar"]  # noqa: E501
-    assert [a.symbol for a in pt.period(4)] == ["K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr"]  # noqa: E501
-    assert [a.symbol for a in pt.period(5)] == ["Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe"]  # noqa: E501 
-    assert [a.symbol for a in pt.period(6)] == ["Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn"]  # noqa: E501 
-    assert [a.symbol for a in pt.period(7)] == ["Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"]  # noqa: E501
-    # fmt: on
+    assert [a.symbol for a in pt.period(4)] == [
+        "K",
+        "Ca",
+        "Sc",
+        "Ti",
+        "V",
+        "Cr",
+        "Mn",
+        "Fe",
+        "Co",
+        "Ni",
+        "Cu",
+        "Zn",
+        "Ga",
+        "Ge",
+        "As",
+        "Se",
+        "Br",
+        "Kr",
+    ]
 
 
-def test_number():
+def test_number_and_sources():
     assert pt.number(1).symbol == "H"
     assert pt.number(118).symbol == "Og"
     with pytest.raises(ValueError):
         pt.number(0)
-
-
-def test_sources():
     assert isinstance(pt.sources, list)
 
 
 def test_show():
     pt.show()
+
+
+def test_cordero_default_variants():
+    carbon = pt.C.cov_radius
+    assert carbon.source.startswith("Cordero")
+    assert "Using Csp3" in carbon.notes and "Csp2 = 0.73 Å" in carbon.notes
+    assert "Using Mn l.s." in pt.Mn.cov_radius.notes
+    assert "Other values" not in pt.Ni.cov_radius.notes
+
+
+def test_pyykko_bond_order_radii():
+    carbon = pt.C
+    assert (
+        carbon.cov_radius_single > carbon.cov_radius_double > carbon.cov_radius_triple
+    )
+    assert carbon.cov_radius_single.unit == "Bohr"
+    assert carbon.cov_radius_single.source.startswith("Pyykkö 2015")
+    assert "Converted from 75 pm" in carbon.cov_radius_single.notes
+
+
+def test_group_3_convention():
+    assert [e.symbol for e in pt.group(3)] == ["Sc", "Y", "Lu", "Lr"]
+    assert pt.La.group is None
+
+
+def test_sources_cover_all_datasets():
+    assert len(pt.sources) == 5

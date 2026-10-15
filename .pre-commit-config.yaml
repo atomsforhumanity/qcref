@@ -32,10 +32,16 @@ repos:
     rev: v1.16.10
     hooks:
       - id: typos
-        exclude: '(^src/qcconst/data/|^tests/test_periodic_table\.py$)'
+        exclude: '(^src/qcref/data/|^src/qcref/_keys\.py$|^tests/test_periodic_table\.py$)'
 
   - repo: local
     hooks:
+      - id: gen-keys
+        name: regenerate typed data keys
+        language: system
+        entry: uv run python build_tools/gen_keys.py
+        files: '^(src/qcref/data/|build_tools/gen_keys\.py$)'
+        pass_filenames: false
       - id: tests
         name: tests
         stages: [push]

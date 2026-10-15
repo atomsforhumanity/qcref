@@ -1,0 +1,9 @@
+{
+  "source": "Cordero et al. 2008: https://doi.org/10.1039/b801115j",
+  "citation": "B. Cordero, V. Gómez, A. E. Platero-Prats, M. Revés, J. Echeverría, E. Cremades, F. Barragán, S. Alvarez. Covalent radii revisited. Dalton Trans. 2008, 2832-2838.",
+  "notes": "Columns 'element' and 'default' are added by qcref: where the paper lists several radii for one element (C sp3/sp2/sp; Mn, Fe, Co low/high spin), 'default' marks the value used for Element.cov_radius.",
+  "columns": {
+    "cov_radius": {"unit": "Å"},
+    "est_std_dev": {"unit": "pm"}
+  }
+}

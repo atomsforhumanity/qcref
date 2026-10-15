@@ -1,0 +1,5 @@
+{
+  "source": "Curated conversion factors computed from the latest CODATA release (data/codata/)",
+  "notes": "Each row's expression is evaluated against previously defined rows, then the latest CODATA release. A value's source is the sources of its inputs, or the row's own source column for literal values.",
+  "columns": {}
+}

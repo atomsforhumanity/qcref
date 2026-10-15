@@ -1,0 +1,9 @@
+{
+  "source": "PubChem: https://pubchem.ncbi.nlm.nih.gov/periodic-table",
+  "citation": "PubChem Periodic Table of Elements, National Center for Biotechnology Information. Raw CSV: https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/CSV",
+  "columns": {
+    "AtomicMass": {"unit": "amu"},
+    "Electronegativity": {"unit": "Pauling"},
+    "AtomicRadius": {"unit": "pm"}
+  }
+}

@@ -1,0 +1,21 @@
+[project]
+name = "qcconst"
+version = "0.3.0"
+description = "Deprecated: qcconst has been renamed to qcref. Installing this package installs qcref."
+readme = "README.md"
+authors = [{ name = "Colton Hicks", email = "github@coltonhicks.com" }]
+requires-python = ">=3.10"
+dependencies = ["qcref>=0.3.0"]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 7 - Inactive",
+]
+
+[project.urls]
+Homepage = 'https://github.com/atomsforhumanity/qcref'
+Source = 'https://github.com/atomsforhumanity/qcref/tree/master/compat/qcconst'
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

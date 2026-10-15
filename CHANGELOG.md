@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+### Changed
+
+- 🚨 Renamed the package from `qcconst` to `qcref`. A final `qcconst` 0.3.0 release (in `compat/qcconst/`) installs `qcref`, re-exports it, and emits a `DeprecationWarning`.
+- 🚨 Every entry has exactly one key, stored in its CSV: `UPPER_SNAKE_CASE` for constants, CODATA, and solvents; the element symbol for the periodic table. `x.KEY` and `x["KEY"]` are equivalent. Look up by source name with `by_name()` (e.g. `phys.by_name("speed of light in vacuum")`, `pt.by_name("Nickel")`); `phys["<NIST name>"]` no longer works.
+- 🚨 Solvent data now come from the CRC Handbook (106th ed.) permittivity table, with temperature fits via `Solvent.dielectric_at(T)`. Solvent keys move leading locants to the end (`1,4-Dioxane` -> `DIOXANE_1_4`).
+- 🚨 `PeriodicTable.group()`/`.period()` raise `ValueError` instead of `AssertionError`.
+- 🚨 Requires Python 3.10+.
+- Curated constants are computed from the latest CODATA release (`data/constants/constants.csv` expressions), with propagated uncertainties.
+- Pyykkö radii are cited to the 2015 summary: <https://doi.org/10.1021/jp5065819>.
+- Data are stored as published (Å, pm) and converted to Bohr at load time; conversions are recorded in each value's `notes`.
+
+### Added
+
+- Every dataset has a `.meta.json` sidecar with a required `source`; `Value` refuses an empty source.
+- `codata[year]` mapping of all CODATA releases found in `data/codata/`; `phys` is the latest.
+- `Element.cov_radius_single` (Pyykkö 2015 single-bond radii).
+- `Collection.by_name()` lookup by original source name.
+- Typed key declarations (`_keys.py`, generated from the data) so IDEs autocomplete keys and `mypy` flags mistyped ones.
+
+### Fixed
+
+- `BOHR_TO_ANGSTROM` uncertainty was in meters (8.2e-21) instead of Å (8.2e-11).
+- `ANGSTROM_TO_BOHR` and `EV_TO_HARTREE` copied the absolute uncertainty of their inverses instead of propagating it.
+
+### Removed
+
+- `constants.pyi` stub (replaced by generated key declarations).
+
 ## [0.2.2] - 2026-08-26
 
 - Updated GitHub references from `coltonbh` to `atomsforhumanity`.
@@ -58,10 +86,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Core physical constants, periodic table, and solvent properties.
 - Common API for showing available constants and solvents.
 
-[unreleased]: https://github.com/atomsforhumanity/qcconst/compare/0.2.2...HEAD
-[0.2.2]: https://github.com/atomsforhumanity/qcconst/releases/tag/0.2.2
-[0.2.1]: https://github.com/atomsforhumanity/qcconst/releases/tag/0.2.1
-[0.2.0]: https://github.com/atomsforhumanity/qcconst/releases/tag/0.2.0
-[0.1.2]: https://github.com/atomsforhumanity/qcconst/releases/tag/0.1.2
-[0.1.1]: https://github.com/atomsforhumanity/qcconst/releases/tag/0.1.1
-[0.1.0]: https://github.com/atomsforhumanity/qcconst/releases/tag/0.1.0
+[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.2.2...HEAD
+[0.2.2]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.2
+[0.2.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.1
+[0.2.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.0
+[0.1.2]: https://github.com/atomsforhumanity/qcref/releases/tag/0.1.2
+[0.1.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.1.1
+[0.1.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.1.0
