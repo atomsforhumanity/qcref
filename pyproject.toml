@@ -1,6 +1,6 @@
 [project]
 name = "qcref"
-version = "0.2.1"
+version = "0.2.2"
 description = "Lightweight, dependency-free chemistry reference data (CODATA constants, periodic table, solvents) where every value carries its source."
 readme = "README.md"
 authors = [{ name = "Colton Hicks", email = "github@coltonhicks.com" }]
@@ -32,11 +32,11 @@ keywords = [
 ]
 
 [project.urls]
-Homepage = 'https://github.com/coltonbh/qcref'
-Documentation = 'https://github.com/coltonbh/qcref#readme'
-Source = 'https://github.com/coltonbh/qcref'
-Changelog = 'https://github.com/coltonbh/qcref/blob/master/CHANGELOG.md'
-"Bug Tracker" = 'https://github.com/coltonbh/qcref/issues'
+Homepage = 'https://github.com/atomsforhumanity/qcref'
+Documentation = 'https://github.com/atomsforhumanity/qcref#readme'
+Source = 'https://github.com/atomsforhumanity/qcref'
+Changelog = 'https://github.com/atomsforhumanity/qcref/blob/master/CHANGELOG.md'
+"Bug Tracker" = 'https://github.com/atomsforhumanity/qcref/issues'
 
 [dependency-groups]
 dev = [

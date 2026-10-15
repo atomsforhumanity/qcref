@@ -13,8 +13,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = 'https://github.com/coltonbh/qcref'
-Source = 'https://github.com/coltonbh/qcref/tree/master/compat/qcconst'
+Homepage = 'https://github.com/atomsforhumanity/qcref'
+Source = 'https://github.com/atomsforhumanity/qcref/tree/master/compat/qcconst'
 
 [build-system]
 requires = ["hatchling"]

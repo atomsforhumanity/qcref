@@ -1,6 +1,6 @@
 # qcconst → qcref
 
-`qcconst` has been renamed to [`qcref`](https://github.com/coltonbh/qcref). This package only installs `qcref` and re-exports it under the old name with a `DeprecationWarning`.
+`qcconst` has been renamed to [`qcref`](https://github.com/atomsforhumanity/qcref). This package only installs `qcref` and re-exports it under the old name with a `DeprecationWarning`.
 
 ```sh
 python -m pip install qcref

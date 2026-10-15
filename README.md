@@ -3,8 +3,8 @@
 [![image](https://img.shields.io/pypi/v/qcref.svg)](https://pypi.python.org/pypi/qcref)
 [![image](https://img.shields.io/pypi/l/qcref.svg)](https://pypi.python.org/pypi/qcref)
 [![image](https://img.shields.io/pypi/pyversions/qcref.svg)](https://pypi.python.org/pypi/qcref)
-[![Actions status](https://github.com/coltonbh/qcref/workflows/Tests/badge.svg)](https://github.com/coltonbh/qcref/actions)
-[![Actions status](https://github.com/coltonbh/qcref/workflows/Basic%20Code%20Quality/badge.svg)](https://github.com/coltonbh/qcref/actions)
+[![Actions status](https://github.com/atomsforhumanity/qcref/workflows/Tests/badge.svg)](https://github.com/atomsforhumanity/qcref/actions)
+[![Actions status](https://github.com/atomsforhumanity/qcref/workflows/Basic%20Code%20Quality/badge.svg)](https://github.com/atomsforhumanity/qcref/actions)
 
 Lightweight, dependency-free reference data for computational chemistry: CODATA physical constants, conversion factors, a periodic table, and solvent permittivities.
 
@@ -113,7 +113,7 @@ The solvent dataset is generated from the CRC permittivity table. `dielectric` i
 
 ## Adding New Values
 
-All data live in CSV files under [src/qcref/data](https://github.com/coltonbh/qcref/tree/master/src/qcref/data), one folder per dataset. Adding data never requires a code change:
+All data live in CSV files under [src/qcref/data](https://github.com/atomsforhumanity/qcref/tree/master/src/qcref/data), one folder per dataset. Adding data never requires a code change:
 
 - **New entries:** add a row to the dataset's CSV, including its `key`. Keys are `UPPER_SNAKE_CASE` (element symbols for the periodic table) and must be unique; the package refuses to import otherwise.
 - **New CODATA release:** add `data/codata/<year>.csv` and `<year>.meta.json`. `phys` and every curated constant in `data/constants/constants.csv` automatically use the latest release, and older releases stay available as `codata[<year>]`.
@@ -127,10 +127,12 @@ Open a PR and that's it! ✨
 
 ## The QC Suite of Programs
 
-If you like `qcref` you may like my other libraries for computational chemistry.
+The QC Suite works in harmony to provide fast, structured, and interoperable quantum chemistry tools.
 
-- [qcio](https://github.com/coltonbh/qcio) - Elegant and intuitive data structures for quantum chemistry, featuring seamless Jupyter Notebook visualizations. [Documentation](https://qcio.coltonhicks.com)
-- [qccodec](https://github.com/coltonbh/qccodec) - A library for parsing Quantum Chemistry output files into structured data objects and converting structured input objects into program-native input files. Uses data structures from `qcio`.
-- [qcop](https://github.com/coltonbh/qcop) - A package for operating quantum chemistry programs using `qcio` standardized data structures. Compatible with `TeraChem`, `psi4`, `QChem`, `NWChem`, `ORCA`, `Molpro`, `geomeTRIC` and many more.
+- [qcref](https://github.com/atomsforhumanity/qcref) - Lightweight, dependency-free chemistry reference data (CODATA constants, periodic table, solvents) where every value carries its source.
+- [qcdata](https://github.com/atomsforhumanity/qcdata) - Elegant and intuitive data structures for quantum chemistry, featuring seamless Jupyter Notebook visualizations. [Documentation](https://qcdata.docs.atomsforhumanity.org)
+- [qcinf](https://github.com/atomsforhumanity/qcinf) - Cheminformatics algorithms and structure utilities using standardized [qcdata](https://qcdata.docs.atomsforhumanity.org/) data structures.
+- [qccodec](https://github.com/atomsforhumanity/qccodec) - A package for translating between standardized [qcdata](https://github.com/atomsforhumanity/qcdata) data structures and native QC program inputs and outputs.
+- [qccompute](https://github.com/atomsforhumanity/qccompute) - A package for operating quantum chemistry programs using standardized [qcdata](https://qcdata.docs.atomsforhumanity.org/) data structures. Compatible with `TeraChem`, `psi4`, `QChem`, `NWChem`, `ORCA`, `Molpro`, `geomeTRIC` and many more.
 - [BigChem](https://github.com/mtzgroup/bigchem) - A distributed application for running quantum chemistry calculations at scale across clusters of computers or the cloud. Bring multi-node scaling to your favorite quantum chemistry program.
 - `ChemCloud` - A [web application](https://github.com/mtzgroup/chemcloud-server) and associated [Python client](https://github.com/mtzgroup/chemcloud-client) for exposing a BigChem cluster securely over the internet.

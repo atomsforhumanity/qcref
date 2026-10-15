@@ -34,6 +34,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - `constants.pyi` stub (replaced by generated key declarations).
 
+## [0.2.2] - 2026-08-26
+
+- Updated GitHub references from `coltonbh` to `atomsforhumanity`.
+
 ## [0.2.1] - 2025-05-31
 
 ### Added
@@ -82,9 +86,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Core physical constants, periodic table, and solvent properties.
 - Common API for showing available constants and solvents.
 
-[unreleased]: https://github.com/coltonbh/qcref/compare/0.2.1...HEAD
-[0.2.1]: https://github.com/coltonbh/qcref/releases/tag/0.2.1
-[0.2.0]: https://github.com/coltonbh/qcref/releases/tag/0.2.0
-[0.1.2]: https://github.com/coltonbh/qcref/releases/tag/0.1.2
-[0.1.1]: https://github.com/coltonbh/qcref/releases/tag/0.1.1
-[0.1.0]: https://github.com/coltonbh/qcref/releases/tag/0.1.0
+[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.2.2...HEAD
+[0.2.2]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.2
+[0.2.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.1
+[0.2.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.0
+[0.1.2]: https://github.com/atomsforhumanity/qcref/releases/tag/0.1.2
+[0.1.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.1.1
+[0.1.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.1.0
