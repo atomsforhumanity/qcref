@@ -11,6 +11,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, ClassVar, Optional
 
+from ._keys import PeriodicTableKeys
 from .collections import Collection
 from .constants import constants
 from .datasets import DATA_DIR, Dataset, load_dataset
@@ -70,7 +71,7 @@ def _bohr(
     )
 
 
-class PeriodicTable(Collection[Element]):
+class PeriodicTable(PeriodicTableKeys, Collection[Element]):
     key_pattern: ClassVar[re.Pattern[str]] = re.compile(r"^[A-Z][a-z]{0,2}$")
     _datasets: list[Dataset]
 

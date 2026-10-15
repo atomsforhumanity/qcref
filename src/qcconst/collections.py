@@ -3,7 +3,7 @@ from __future__ import annotations
 import keyword
 import re
 from collections.abc import Iterable, Iterator, Mapping
-from typing import Any, Callable, ClassVar, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, TypeVar
 
 from .utils import to_table
 
@@ -49,13 +49,16 @@ class Collection(Generic[T], Mapping[str, T]):
     def __getitem__(self, key: str) -> T:
         return self._entries[key]
 
-    def __getattr__(self, key: str) -> T:
-        try:
-            return self.__dict__["_entries"][key]
-        except KeyError:
-            raise AttributeError(
-                f"{type(self).__name__!s} has no attribute {key!r}"
-            ) from None
+    if not TYPE_CHECKING:
+        # Hidden from type checkers so a mistyped key is an error. Subclasses
+        # inherit typed key declarations from the generated `_keys` module.
+        def __getattr__(self, key: str) -> T:
+            try:
+                return self.__dict__["_entries"][key]
+            except KeyError:
+                raise AttributeError(
+                    f"{type(self).__name__!s} has no attribute {key!r}"
+                ) from None
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._entries)

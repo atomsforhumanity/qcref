@@ -27,17 +27,21 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: [types-tabulate, types-toml]
-        # Generated stubs collide with their .py module when both are passed.
-        exclude: '\.pyi$'
 
   - repo: https://github.com/crate-ci/typos
     rev: v1.16.10
     hooks:
       - id: typos
-        exclude: '(^src/qcconst/data/|^tests/test_periodic_table\.py$)'
+        exclude: '(^src/qcconst/data/|^src/qcconst/_keys\.py$|^tests/test_periodic_table\.py$)'
 
   - repo: local
     hooks:
+      - id: gen-keys
+        name: regenerate typed data keys
+        language: system
+        entry: uv run python build_tools/gen_keys.py
+        files: '^(src/qcconst/data/|build_tools/gen_keys\.py$)'
+        pass_filenames: false
       - id: tests
         name: tests
         stages: [push]

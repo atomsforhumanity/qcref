@@ -18,13 +18,14 @@ def make(*pairs: tuple[str, str]) -> Collection[Item]:
 
 def test_attribute_and_item_access_use_the_same_key():
     collection = make(("A_B", "A-B"))
-    assert collection.A_B is collection["A_B"] is collection.by_name("a-b")
+    # getattr: a bare Collection has no generated key declarations for mypy
+    assert getattr(collection, "A_B") is collection["A_B"] is collection.by_name("a-b")
     assert list(collection) == collection.as_list() == ["A_B"]
     assert "A_B" in dir(collection)
     with pytest.raises(KeyError):
         collection["A-B"]
     with pytest.raises(AttributeError):
-        _ = collection.a_b
+        getattr(collection, "a_b")
 
 
 @pytest.mark.parametrize("key", ["lower", "_LEADING", "1ABC", "A-B"])

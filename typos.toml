@@ -1,2 +1,2 @@
 [files]
-extend-exclude = ["src/qcconst/data/**", "tests/test_periodic_table.py"]
+extend-exclude = ["src/qcconst/data/**", "src/qcconst/_keys.py", "tests/test_periodic_table.py"]

@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from ._keys import SolventKeys
 from .collections import Collection
 from .datasets import DATA_DIR, load_dataset
 from .models import Value
@@ -53,7 +54,7 @@ class Solvent:
         return self.fit.evaluate(T, strict=strict)
 
 
-class SolventCollection(Collection[Solvent]):
+class SolventCollection(SolventKeys, Collection[Solvent]):
     def _row(self, entry: Solvent) -> dict[str, Any]:
         return {
             "name": entry.name,

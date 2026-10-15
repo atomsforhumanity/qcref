@@ -115,6 +115,8 @@ All data live in CSV files under [src/qcconst/data](https://github.com/coltonbh/
 
 Every CSV has a `<name>.meta.json` sidecar with a required `source` (plus optional `citation`, `notes`, and per-column `units`). Values are stored exactly as published; conversions such as Å to Bohr happen at load time and are recorded in each value's `notes`. Every loaded value must have a source.
 
+Keys are visible to type checkers and IDEs through the generated `src/qcconst/_keys.py`, so `pt.Ni` autocompletes and a mistyped key is a `mypy` error. The pre-commit hook and the build regenerate it whenever data change (or run `python build_tools/gen_keys.py`); a test fails if it is stale.
+
 Open a PR and that's it! ✨
 
 ## The QC Suite of Programs

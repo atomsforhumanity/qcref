@@ -1,5 +1,5 @@
 # Hatch build hook – executed automatically when running `uv build`
-# # This hook generates stub files for the constants.py module.
+# Regenerates src/qcconst/_keys.py (typed key declarations) from the CSV data.
 import subprocess
 import sys
 from pathlib import Path
@@ -8,13 +8,12 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from hatchling.plugin import hookimpl
 
 
-class StubGenHook(BuildHookInterface):
+class KeysGenHook(BuildHookInterface):
     def initialize(self, version, build_data):
-        gen = Path(__file__).with_name("gen_stubs.py")
-        # python /path/to/gen_stubs.py
+        gen = Path(__file__).with_name("gen_keys.py")
         subprocess.check_call([sys.executable, str(gen)])
 
 
 @hookimpl
 def hatch_register_build_hook():
-    return StubGenHook
+    return KeysGenHook
