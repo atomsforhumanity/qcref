@@ -1,7 +1,7 @@
 import pytest
 
-from qcconst import constants, phys
-from qcconst.constants import BOHR_TO_ANGSTROM, codata
+from qcref import constants, phys
+from qcref.constants import BOHR_TO_ANGSTROM, codata
 
 
 def test_constants_collection_access():

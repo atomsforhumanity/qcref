@@ -1,7 +1,7 @@
 import pytest
 
-from qcconst import PeriodicTable
-from qcconst import periodic_table as pt
+from qcref import PeriodicTable
+from qcref import periodic_table as pt
 
 
 def test_periodic_table_from_pubchem():

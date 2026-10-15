@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from qcconst import solvents
-from qcconst.solvents import DielectricFit
+from qcref import solvents
+from qcref.solvents import DielectricFit
 
 
 def test_solvent_collection_access():
@@ -36,7 +36,7 @@ def test_solvent_temperature_fit_loading():
 
 
 def test_solvent_csv_schema():
-    with Path("src/qcconst/data/solvents/crc.csv").open() as f:
+    with Path("src/qcref/data/solvents/crc.csv").open() as f:
         rows = list(csv.DictReader(f))
     assert rows
     assert {

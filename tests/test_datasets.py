@@ -3,10 +3,10 @@ import json
 
 import pytest
 
-from qcconst import constants, periodic_table, solvents
-from qcconst.constants import codata
-from qcconst.datasets import DATA_DIR, load_dataset
-from qcconst.models import Value
+from qcref import constants, periodic_table, solvents
+from qcref.constants import codata
+from qcref.datasets import DATA_DIR, load_dataset
+from qcref.models import Value
 
 CSV_PATHS = sorted(DATA_DIR.glob("*/*.csv"))
 

@@ -1,7 +1,7 @@
 import pytest
 
-from qcconst.expressions import evaluate
-from qcconst.models import Value
+from qcref.expressions import evaluate
+from qcref.models import Value
 
 
 def v(value, uncertainty):

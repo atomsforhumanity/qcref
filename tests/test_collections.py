@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from qcconst.collections import Collection
+from qcref.collections import Collection
 
 
 @dataclass(frozen=True)

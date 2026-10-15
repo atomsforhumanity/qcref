@@ -1,7 +1,7 @@
 [project]
-name = "qcconst"
+name = "qcref"
 version = "0.2.1"
-description = "Physical constants, conversion factors, and a periodic table with clear source information for every value."
+description = "Lightweight, dependency-free chemistry reference data (CODATA constants, periodic table, solvents) where every value carries its source."
 readme = "README.md"
 authors = [{ name = "Colton Hicks", email = "github@coltonhicks.com" }]
 requires-python = ">=3.10"
@@ -22,6 +22,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 keywords = [
+    "reference data",
     "constants",
     "periodic table",
     "scientific computing",
@@ -31,11 +32,11 @@ keywords = [
 ]
 
 [project.urls]
-Homepage = 'https://github.com/coltonbh/qcconst'
-Documentation = 'https://github.com/coltonbh/qcconst#readme'
-Source = 'https://github.com/coltonbh/qcconst'
-Changelog = 'https://github.com/coltonbh/qcconst/blob/master/CHANGELOG.md'
-"Bug Tracker" = 'https://github.com/coltonbh/qcconst/issues'
+Homepage = 'https://github.com/coltonbh/qcref'
+Documentation = 'https://github.com/coltonbh/qcref#readme'
+Source = 'https://github.com/coltonbh/qcref'
+Changelog = 'https://github.com/coltonbh/qcref/blob/master/CHANGELOG.md'
+"Bug Tracker" = 'https://github.com/coltonbh/qcref/issues'
 
 [dependency-groups]
 dev = [
@@ -62,14 +63,16 @@ target-version = "py310"
 
 [tool.coverage.run]
 branch = true
-source = ["qcconst"]
+source = ["qcref"]
 
 [tool.coverage.report]
 show_missing = true
 
 [tool.ruff.lint]
-isort = { known-first-party = ["qcconst", "tests"] }
+isort = { known-first-party = ["qcref", "tests"] }
 select = ["I", "F401"]
 
 [tool.mypy]
 ignore_missing_imports = true
+[tool.hatch.build.targets.sdist]
+exclude = ["compat", "*.pdf"]

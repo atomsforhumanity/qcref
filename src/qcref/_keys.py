@@ -24,7 +24,7 @@ __all__ = [
     "codata2022",
 ]
 
-# Module-level names of qcconst.constants
+# Module-level names of qcref.constants
 BOHR_TO_ANGSTROM: Value
 ANGSTROM_TO_BOHR: Value
 HARTREE_TO_JOULE: Value

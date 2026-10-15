@@ -1,12 +1,18 @@
-# QCConst
+# QCRef
 
-[![image](https://img.shields.io/pypi/v/qcconst.svg)](https://pypi.python.org/pypi/qcconst)
-[![image](https://img.shields.io/pypi/l/qcconst.svg)](https://pypi.python.org/pypi/qcconst)
-[![image](https://img.shields.io/pypi/pyversions/qcconst.svg)](https://pypi.python.org/pypi/qcconst)
-[![Actions status](https://github.com/coltonbh/qcconst/workflows/Tests/badge.svg)](https://github.com/coltonbh/qcconst/actions)
-[![Actions status](https://github.com/coltonbh/qcconst/workflows/Basic%20Code%20Quality/badge.svg)](https://github.com/coltonbh/qcconst/actions)
+[![image](https://img.shields.io/pypi/v/qcref.svg)](https://pypi.python.org/pypi/qcref)
+[![image](https://img.shields.io/pypi/l/qcref.svg)](https://pypi.python.org/pypi/qcref)
+[![image](https://img.shields.io/pypi/pyversions/qcref.svg)](https://pypi.python.org/pypi/qcref)
+[![Actions status](https://github.com/coltonbh/qcref/workflows/Tests/badge.svg)](https://github.com/coltonbh/qcref/actions)
+[![Actions status](https://github.com/coltonbh/qcref/workflows/Basic%20Code%20Quality/badge.svg)](https://github.com/coltonbh/qcref/actions)
 
-Physical constants, conversion factors, solvent permittivities, and a periodic table with clear source information for every value. Data from NIST CODATA 2022, PubChem, and the CRC Handbook. All data keep source metadata alongside the numerical values.
+Lightweight, dependency-free reference data for computational chemistry: CODATA physical constants, conversion factors, a periodic table, and solvent permittivities.
+
+- **Every value carries its source.** Each number is a `float` with `.source`, `.unit`, `.uncertainty`, and `.notes`; the package refuses to load a value without a source.
+- **Data releases are versioned.** CODATA releases live side by side (`codata[2022]`), and `phys` and the curated conversion factors always follow the latest.
+- **Adding data never requires code changes.** All values live in CSV files with a metadata sidecar citing their source.
+
+> Formerly `qcconst`. `pip install qcconst` now installs `qcref` and warns on import; switch to `import qcref`.
 
 ## Data Sources
 
@@ -20,12 +26,12 @@ Each piece of data contains a link to its source. Primary data sources include:
 ## Installation
 
 ```sh
-python -m pip install qcconst
+python -m pip install qcref
 ```
 
 ## Quickstart
 
-Each dataset in `qcconst` is a collection keyed the same way everywhere:
+Each dataset in `qcref` is a collection keyed the same way everywhere:
 
 - Every entry has exactly one key, stored in the dataset's CSV file: `UPPER_SNAKE_CASE` for constants and solvents, the element symbol (`Ni`) for the periodic table.
 - `collection.KEY` and `collection["KEY"]` are equivalent and are the only ways to look up by key.
@@ -35,7 +41,7 @@ Each dataset in `qcconst` is a collection keyed the same way everywhere:
 ### Constants
 
 ```python
->>> from qcconst import constants
+>>> from qcref import constants
 
 >>> constants.BOHR_TO_ANGSTROM
 0.529177210544, unit=Å, uncertainty=8.2e-11, source=CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt, name=BOHR_TO_ANGSTROM, notes=Computed as BOHR_RADIUS * 1e10.
@@ -51,7 +57,7 @@ Each dataset in `qcconst` is a collection keyed the same way everywhere:
 ['BOHR_TO_ANGSTROM', 'ANGSTROM_TO_BOHR', 'HARTREE_TO_JOULE', 'AVOGADRO_NUMBER']
 
 # Curated constants can also be imported directly
->>> from qcconst.constants import HARTREE_TO_EV
+>>> from qcref.constants import HARTREE_TO_EV
 ```
 
 ### All CODATA Physical Constants
@@ -59,7 +65,7 @@ Each dataset in `qcconst` is a collection keyed the same way everywhere:
 Every CODATA release in the package is available as `codata[<year>]` (also `constants.codata2022`, ...). `phys` always points to the latest release, currently 2022. Keys are the `UPPER_SNAKE_CASE` form of the NIST quantity name; `by_name` accepts the NIST name itself.
 
 ```python
->>> from qcconst import phys
+>>> from qcref import phys
 
 >>> phys.SPEED_OF_LIGHT_IN_VACUUM
 299792458.0, unit=m s^-1, uncertainty=0.0, source=CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt, name=speed of light in vacuum
@@ -71,7 +77,7 @@ Every CODATA release in the package is available as `codata[<year>]` (also `cons
 ### Periodic Table
 
 ```python
->>> from qcconst import periodic_table as pt
+>>> from qcref import periodic_table as pt
 
 >>> pt.Ni
 Element(symbol='Ni', number=28, name='Nickel', ...)
@@ -88,7 +94,7 @@ True
 Solvent keys are the `UPPER_SNAKE_CASE` form of the CRC name. A leading locant is moved to the end, following the CAS index convention, so `1,4-Dioxane` is `DIOXANE_1_4`.
 
 ```python
->>> from qcconst import solvents
+>>> from qcref import solvents
 
 >>> solvents.ACETONE
 Solvent(name='Acetone', formula='C3H6O', dielectric=21.01, dielectric_temperature_k=293.15, ...)
@@ -107,7 +113,7 @@ The solvent dataset is generated from the CRC permittivity table. `dielectric` i
 
 ## Adding New Values
 
-All data live in CSV files under [src/qcconst/data](https://github.com/coltonbh/qcconst/tree/master/src/qcconst/data), one folder per dataset. Adding data never requires a code change:
+All data live in CSV files under [src/qcref/data](https://github.com/coltonbh/qcref/tree/master/src/qcref/data), one folder per dataset. Adding data never requires a code change:
 
 - **New entries:** add a row to the dataset's CSV, including its `key`. Keys are `UPPER_SNAKE_CASE` (element symbols for the periodic table) and must be unique; the package refuses to import otherwise.
 - **New CODATA release:** add `data/codata/<year>.csv` and `<year>.meta.json`. `phys` and every curated constant in `data/constants/constants.csv` automatically use the latest release, and older releases stay available as `codata[<year>]`.
@@ -115,13 +121,13 @@ All data live in CSV files under [src/qcconst/data](https://github.com/coltonbh/
 
 Every CSV has a `<name>.meta.json` sidecar with a required `source` (plus optional `citation`, `notes`, and per-column `units`). Values are stored exactly as published; conversions such as Å to Bohr happen at load time and are recorded in each value's `notes`. Every loaded value must have a source.
 
-Keys are visible to type checkers and IDEs through the generated `src/qcconst/_keys.py`, so `pt.Ni` autocompletes and a mistyped key is a `mypy` error. The pre-commit hook and the build regenerate it whenever data change (or run `python build_tools/gen_keys.py`); a test fails if it is stale.
+Keys are visible to type checkers and IDEs through the generated `src/qcref/_keys.py`, so `pt.Ni` autocompletes and a mistyped key is a `mypy` error. The pre-commit hook and the build regenerate it whenever data change (or run `python build_tools/gen_keys.py`); a test fails if it is stale.
 
 Open a PR and that's it! ✨
 
 ## The QC Suite of Programs
 
-If you like `qcconst` you may like my other libraries for computational chemistry.
+If you like `qcref` you may like my other libraries for computational chemistry.
 
 - [qcio](https://github.com/coltonbh/qcio) - Elegant and intuitive data structures for quantum chemistry, featuring seamless Jupyter Notebook visualizations. [Documentation](https://qcio.coltonhicks.com)
 - [qccodec](https://github.com/coltonbh/qccodec) - A library for parsing Quantum Chemistry output files into structured data objects and converting structured input objects into program-native input files. Uses data structures from `qcio`.

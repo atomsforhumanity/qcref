@@ -189,7 +189,7 @@ wheels = [
 ]
 
 [[package]]
-name = "qcconst"
+name = "qcref"
 version = "0.2.1"
 source = { editable = "." }
 

@@ -1,5 +1,5 @@
 # Hatch build hook – executed automatically when running `uv build`
-# Regenerates src/qcconst/_keys.py (typed key declarations) from the CSV data.
+# Regenerates src/qcref/_keys.py (typed key declarations) from the CSV data.
 import subprocess
 import sys
 from pathlib import Path
