@@ -75,6 +75,7 @@ def update_changelog(version, repo_url):
 def run_git_commands(version):
     """Run the git commands to commit the changes, create a new tag, and push."""
     print("Running git commands...")
+    subprocess.run(["uv", "lock"], check=True)  # Sync the lockfile's own version
     subprocess.run(["git", "add", "."], check=True)
     subprocess.run(
         ["git", "commit", "-m", f"Bumped version to {version}. Updated CHANGELOG."],
