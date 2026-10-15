@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar
 
 from ._keys import PeriodicTableKeys
 from .collections import Collection
@@ -26,24 +26,46 @@ _BOHR_PER_UNIT = {
 
 @dataclass(frozen=True)
 class Element:
+    """A chemical element and its properties.
+
+    Radii are in Bohr; properties missing from the sources are None.
+
+    Attributes:
+        symbol: Element symbol, such as ``"Fe"``.
+        number: Atomic number.
+        name: Element name.
+        mass: Atomic mass in amu (PubChem).
+        group: Group number (1-18), or None if the element has no group.
+        period: Period number (1-7).
+        block: PubChem group block, such as ``"Noble gas"``.
+        electron_config: Ground-state electron configuration (PubChem).
+        electronegativity: Pauling electronegativity (PubChem).
+        atomic_radius: Atomic radius (PubChem).
+        cov_radius: Covalent radius (Cordero et al., 2008).
+        cov_radius_single: Single-bond covalent radius (Pyykko, 2015).
+        cov_radius_double: Double-bond covalent radius (Pyykko, 2015).
+        cov_radius_triple: Triple-bond covalent radius (Pyykko, 2015).
+        vdw_radius: Van der Waals radius (Alvarez, 2013).
+    """
+
     symbol: str
     number: int
     name: str
     mass: Value
-    group: Optional[int]
+    group: int | None
     period: int
     block: str
     electron_config: str
-    electronegativity: Optional[Value]
-    atomic_radius: Optional[Value]
-    cov_radius: Optional[Value]
-    cov_radius_single: Optional[Value]
-    cov_radius_double: Optional[Value]
-    cov_radius_triple: Optional[Value]
-    vdw_radius: Optional[Value]
+    electronegativity: Value | None
+    atomic_radius: Value | None
+    cov_radius: Value | None
+    cov_radius_single: Value | None
+    cov_radius_double: Value | None
+    cov_radius_triple: Value | None
+    vdw_radius: Value | None
 
 
-def _value(dataset: Dataset, column: str, raw: str, notes: str = "") -> Optional[Value]:
+def _value(dataset: Dataset, column: str, raw: str, notes: str = "") -> Value | None:
     """A Value in the column's published unit, or None if the cell is empty."""
     if not raw:
         return None
@@ -55,8 +77,8 @@ def _bohr(
     column: str,
     raw: str,
     notes: str = "",
-    uncertainty: Optional[float] = None,
-) -> Optional[Value]:
+    uncertainty: float | None = None,
+) -> Value | None:
     """A length in Bohr converted from the column's published unit."""
     if not raw:
         return None
@@ -72,11 +94,14 @@ def _bohr(
 
 
 class PeriodicTable(PeriodicTableKeys, Collection[Element]):
+    """Collection of elements keyed by symbol, such as ``periodic_table.Fe``."""
+
     key_pattern: ClassVar[re.Pattern[str]] = re.compile(r"^[A-Z][a-z]{0,2}$")
     _datasets: list[Dataset]
 
     @classmethod
     def from_data(cls) -> PeriodicTable:
+        """Build the table from the bundled element datasets."""
         pubchem, group_period, cordero, pyykko, alvarez = datasets = [
             load_dataset(_ELEMENTS_DIR / f"{name}.csv")
             for name in (
@@ -95,7 +120,7 @@ class PeriodicTable(PeriodicTableKeys, Collection[Element]):
         for row in cordero.rows:
             cordero_rows[row["element"]].append(row)
 
-        def cov_radius(symbol: str) -> Optional[Value]:
+        def cov_radius(symbol: str) -> Value | None:
             rows = cordero_rows.get(symbol)
             if not rows:
                 return None
@@ -118,7 +143,7 @@ class PeriodicTable(PeriodicTableKeys, Collection[Element]):
                 else None,
             )
 
-        def vdw_radius(symbol: str) -> Optional[Value]:
+        def vdw_radius(symbol: str) -> Value | None:
             row = alvarez_rows.get(symbol)
             if row is None:
                 return None
@@ -169,16 +194,37 @@ class PeriodicTable(PeriodicTableKeys, Collection[Element]):
         return table
 
     def group(self, group_number: int) -> list[Element]:
+        """Return the elements in a group.
+
+        Args:
+            group_number: Group number, from 1 to 18.
+
+        Raises:
+            ValueError: If ``group_number`` is outside 1-18.
+        """
         if not 1 <= group_number <= 18:
             raise ValueError("Group number must be between 1 and 18.")
         return [element for element in self.values() if element.group == group_number]
 
     def period(self, period_number: int) -> list[Element]:
+        """Return the elements in a period.
+
+        Args:
+            period_number: Period number, from 1 to 7.
+
+        Raises:
+            ValueError: If ``period_number`` is outside 1-7.
+        """
         if not 1 <= period_number <= 7:
             raise ValueError("Period number must be between 1 and 7.")
         return [element for element in self.values() if element.period == period_number]
 
     def number(self, number: int) -> Element:
+        """Return the element with the given atomic number.
+
+        Raises:
+            ValueError: If no element has that atomic number.
+        """
         for element in self.values():
             if element.number == number:
                 return element
@@ -186,6 +232,7 @@ class PeriodicTable(PeriodicTableKeys, Collection[Element]):
 
     @property
     def sources(self) -> list[str]:
+        """Sources of the underlying datasets, sorted."""
         return sorted(dataset.source for dataset in self._datasets)
 
     def _row(self, entry: Element) -> dict[str, Any]:

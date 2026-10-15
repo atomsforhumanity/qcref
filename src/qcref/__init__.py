@@ -1,3 +1,10 @@
+"""Reference data for quantum chemistry.
+
+Physical constants (`constants`, `phys`, `codata`), the periodic table
+(`periodic_table`), and solvent permittivities (`solvents`), each value
+carrying its unit and source.
+"""
+
 from importlib import metadata as _metadata
 
 try:

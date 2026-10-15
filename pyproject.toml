@@ -40,13 +40,17 @@ Changelog = 'https://github.com/atomsforhumanity/qcref/blob/master/CHANGELOG.md'
 
 [dependency-groups]
 dev = [
-    "mypy>=1.15.0",
-    "pytest>=8.3.5",
-    "pytest-cov>=6.0.0",
-    "ruff>=0.11.1",
+    "detect-secrets>=1.5",
+    "mypy>=1.15",
+    "pre-commit>=4.0",
+    "pre-commit-hooks>=5.0",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.12",
     "toml>=0.10.2",
     "types-tabulate>=0.9.0.20241207",
     "types-toml>=0.10.8.20240310",
+    "typos>=1.30",
 ]
 
 [build-system]
@@ -57,9 +61,28 @@ build-backend = "hatchling.build"
 path = "build_tools/build_hook.py"
 
 [tool.ruff]
-exclude = [".venv"]
 line-length = 88
 target-version = "py310"
+extend-exclude = ["*.ipynb", "*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "D"]
+ignore = ["E501"] # line length is the formatter's job
+
+[tool.ruff.lint.isort]
+known-first-party = ["qcref", "tests"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]
+"scripts/**" = ["D"]
+"docs/**" = ["D"]
+"examples/**" = ["D"]
+"build_tools/**" = ["D"]
+# Generated keys are element symbols; O and I are legitimate names here.
+"src/qcref/_keys.py" = ["E741"]
 
 [tool.coverage.run]
 branch = true
@@ -68,11 +91,19 @@ source = ["qcref"]
 [tool.coverage.report]
 show_missing = true
 
-[tool.ruff.lint]
-isort = { known-first-party = ["qcref", "tests"] }
-select = ["I", "F401"]
-
 [tool.mypy]
+python_version = "3.10"
+files = ["src", "tests", "scripts", "build_tools"]
 ignore_missing_imports = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
 [tool.hatch.build.targets.sdist]
 exclude = ["compat", "*.pdf"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"

@@ -1,4 +1,8 @@
-from typing import Optional
+"""Numeric reference values that carry their unit, source, and uncertainty."""
+
+from __future__ import annotations
+
+from typing import SupportsFloat, SupportsIndex
 
 
 class Value(float):
@@ -10,19 +14,33 @@ class Value(float):
 
     unit: str
     source: str
-    uncertainty: Optional[float]
+    uncertainty: float | None
     notes: str
     name: str
 
     def __new__(
         cls,
-        value,
+        value: str | SupportsFloat | SupportsIndex,
         unit: str,
         source: str,
-        uncertainty: Optional[float],
+        uncertainty: float | None,
         notes: str,
         name: str = "",
-    ):
+    ) -> Value:
+        """Create a Value.
+
+        Args:
+            value: The number, or anything `float()` accepts.
+            unit: Unit of the value; empty for dimensionless quantities.
+            source: Citation for the value; must not be blank.
+            uncertainty: Standard uncertainty in the same unit; 0.0 for exact
+                values, None if unknown or not applicable.
+            notes: Free-text remarks about the value.
+            name: Original (source) name of the quantity, if any.
+
+        Raises:
+            ValueError: If ``source`` is empty or blank.
+        """
         if not source or not source.strip():
             raise ValueError("Every Value must have a source.")
         obj = float.__new__(cls, value)
@@ -33,7 +51,8 @@ class Value(float):
         obj.name = name
         return obj
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Return the number followed by its metadata."""
         pieces = [
             str(float(self)),
             f"unit={self.unit}",

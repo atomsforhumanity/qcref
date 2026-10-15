@@ -1,9 +1,11 @@
+"""Read-only collections of reference data with attribute access by key."""
+
 from __future__ import annotations
 
 import keyword
 import re
-from collections.abc import Iterable, Iterator, Mapping
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, TypeVar
+from collections.abc import Callable, Iterable, Iterator, Mapping
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
 from .utils import to_table
 
@@ -23,6 +25,17 @@ class Collection(Generic[T], Mapping[str, T]):
     def __init__(
         self, entries: Iterable[tuple[str, T]], *, name_of: Callable[[T], str]
     ) -> None:
+        """Build the collection from key/entry pairs.
+
+        Args:
+            entries: ``(key, entry)`` pairs in dataset order.
+            name_of: Returns an entry's original (source) name, used by
+                `by_name`.
+
+        Raises:
+            ValueError: If a key is duplicated or invalid, or two entries share
+                a name (ignoring case).
+        """
         self._entries: dict[str, T] = {}
         self._keys_by_name: dict[str, str] = {}
         for key, entry in entries:
@@ -47,12 +60,14 @@ class Collection(Generic[T], Mapping[str, T]):
             raise ValueError(f"Invalid key {key!r} for {type(self).__name__}.")
 
     def __getitem__(self, key: str) -> T:
+        """Return the entry stored under a key."""
         return self._entries[key]
 
     if not TYPE_CHECKING:
         # Hidden from type checkers so a mistyped key is an error. Subclasses
         # inherit typed key declarations from the generated `_keys` module.
         def __getattr__(self, key: str) -> T:
+            """Return the entry stored under a key, as an attribute."""
             try:
                 return self.__dict__["_entries"][key]
             except KeyError:
@@ -61,15 +76,19 @@ class Collection(Generic[T], Mapping[str, T]):
                 ) from None
 
     def __iter__(self) -> Iterator[str]:
+        """Iterate over keys in dataset order."""
         return iter(self._entries)
 
     def __len__(self) -> int:
+        """Return the number of entries."""
         return len(self._entries)
 
     def __dir__(self) -> list[str]:
+        """List attributes, including every entry key."""
         return sorted(set(super().__dir__()) | set(self._entries))
 
     def __repr__(self) -> str:
+        """Return the class name and number of entries."""
         return f"{type(self).__name__}({len(self)} entries)"
 
     def as_list(self) -> list[str]:

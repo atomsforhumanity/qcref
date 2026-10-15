@@ -13,6 +13,19 @@ from .models import Value
 
 @dataclass(frozen=True)
 class DielectricFit:
+    """Polynomial fit of a dielectric constant against temperature.
+
+    The dielectric constant is ``a + b*T + c*T**2 + d*T**3`` with T in K.
+
+    Attributes:
+        a: Constant term.
+        b: Linear coefficient, per K.
+        c: Quadratic coefficient, per K**2.
+        d: Cubic coefficient, per K**3.
+        t_min_k: Lower end of the valid temperature range in K, or None.
+        t_max_k: Upper end of the valid temperature range in K, or None.
+    """
+
     a: float
     b: float = 0.0
     c: float = 0.0
@@ -21,6 +34,18 @@ class DielectricFit:
     t_max_k: float | None = None
 
     def evaluate(self, T: float, strict: bool = True) -> float:
+        """Evaluate the fit at a temperature.
+
+        Args:
+            T: Temperature in K.
+            strict: Whether to reject temperatures outside the fit range.
+
+        Returns:
+            The dielectric constant at ``T``.
+
+        Raises:
+            ValueError: If ``strict`` and ``T`` is outside the fit range.
+        """
         if strict:
             if self.t_min_k is not None and T < self.t_min_k:
                 raise ValueError(f"Temperature {T} K is below the fit range.")
@@ -31,6 +56,17 @@ class DielectricFit:
 
 @dataclass(frozen=True)
 class Solvent:
+    """A solvent and its dielectric constant (relative permittivity).
+
+    Attributes:
+        name: Solvent name.
+        formula: Molecular formula, or None if not listed.
+        dielectric: Dielectric constant at ``dielectric_temperature_k``.
+        dielectric_temperature_k: Temperature in K at which ``dielectric``
+            applies, or None if not listed.
+        fit: Temperature dependence of the dielectric constant, or None.
+    """
+
     name: str
     formula: str | None
     dielectric: Value
@@ -44,9 +80,20 @@ class Solvent:
 
     @property
     def has_temperature_fit(self) -> bool:
+        """Whether a temperature-dependent dielectric fit is available."""
         return self.fit is not None
 
     def dielectric_at(self, T: float, strict: bool = True) -> float:
+        """Return the dielectric constant at a temperature, from the fit.
+
+        Args:
+            T: Temperature in K.
+            strict: Whether to reject temperatures outside the fit range.
+
+        Raises:
+            ValueError: If the solvent has no temperature fit, or if ``strict``
+                and ``T`` is outside the fit range.
+        """
         if self.fit is None:
             raise ValueError(
                 f"{self.name} does not have a temperature-dependent dielectric fit."
@@ -55,6 +102,8 @@ class Solvent:
 
 
 class SolventCollection(SolventKeys, Collection[Solvent]):
+    """Collection of solvents keyed by identifier, such as ``solvents.WATER``."""
+
     def _row(self, entry: Solvent) -> dict[str, Any]:
         return {
             "name": entry.name,

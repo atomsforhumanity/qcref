@@ -1,10 +1,21 @@
+"""Plain-text table formatting."""
+
+from __future__ import annotations
+
 import numbers
+from collections.abc import Sequence
 from dataclasses import fields, is_dataclass
-from typing import Optional
+from typing import Any
 
 
-def to_table(objects, headers: Optional[list[str]] = None):
-    """Convert a list of dataclass objects into a nicely formatted table."""
+def to_table(objects: Sequence[Any], headers: list[str] | None = None) -> None:
+    """Print dicts, dataclass instances, or plain objects as a table.
+
+    Args:
+        objects: Items to show, one per row; all of the same kind as the first.
+        headers: Keys or attribute names to show as columns. Defaults to all
+            keys, fields, or instance attributes of the first item.
+    """
     if not objects:
         print("No data to display.")
         return
@@ -22,7 +33,9 @@ def to_table(objects, headers: Optional[list[str]] = None):
 
 
 def _tabulate(
-    rows: list[list[str]], headers: Optional[list[str]] = None, num_format: str = ".5g"
+    rows: Sequence[Sequence[object]],
+    headers: list[str] | None = None,
+    num_format: str = ".5g",
 ) -> str:
     """Format a list of rows into a table. Replacement for tabulate package."""
     table = []
@@ -44,17 +57,17 @@ def _tabulate(
         text_rows.append(txt_row)
 
     # 2) Compute column widths from headers + text_rows
-    cols = list(zip([str(h) for h in headers], *text_rows))
+    cols = list(zip([str(h) for h in headers], *text_rows, strict=False))
     widths = [max(len(item) for item in col) for col in cols]
     sep = "  "  # two spaces between columns
 
     # 4) Print header and separator
-    header_line = sep.join(h.ljust(w) for h, w in zip(headers, widths))
+    header_line = sep.join(h.ljust(w) for h, w in zip(headers, widths, strict=False))
     table.append(header_line)
     table.append(sep.join("-" * w for w in widths))
 
     # 5) Create each data row, right-aligning numbers, left-aligning text
-    for raw_row, txt_row in zip(rows, text_rows):
+    for raw_row, txt_row in zip(rows, text_rows, strict=True):
         line = sep.join(
             txt.rjust(widths[i])
             if isinstance(raw_row[i], numbers.Real)
