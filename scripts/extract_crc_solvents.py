@@ -12,8 +12,11 @@ import csv
 import re
 import subprocess
 import xml.etree.ElementTree as ET
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
+
+from keys import make_key
 
 ROOT = Path(__file__).resolve().parents[1]
 PDF_PATH = ROOT / "CRC Solvent Data.pdf"
@@ -29,8 +32,6 @@ COEFFICIENT_LEFT_MIN = 444
 COEFFICIENT_LEFT_MAX = 756
 TEMP_RANGE_LEFT_MIN = 756
 ROW_ASSIGNMENT_THRESHOLD = 9
-_NON_IDENTIFIER_CHARS = re.compile(r"[\s,\-./()]+")
-_REPEATED_UNDERSCORES = re.compile(r"_+")
 
 
 @dataclass(frozen=True)
@@ -56,20 +57,6 @@ class ParsedRow:
     t_max_k: float | None
 
 
-def normalize_name(name: str) -> str:
-    normalized = _NON_IDENTIFIER_CHARS.sub("_", name.strip().lower())
-    normalized = _REPEATED_UNDERSCORES.sub("_", normalized).strip("_")
-    if normalized and normalized[0].isdigit():
-        normalized = f"_{normalized}"
-    normalized = re.sub(r"[^0-9a-zA-Z_]", "_", normalized)
-    normalized = _REPEATED_UNDERSCORES.sub("_", normalized).strip("_")
-    if normalized and normalized[0].isdigit():
-        normalized = f"_{normalized}"
-    if not normalized or not normalized.isidentifier():
-        raise ValueError(f"Cannot normalize {name!r}")
-    return normalized
-
-
 def load_xml(pdf_path: Path) -> ET.Element:
     result = subprocess.run(
         ["pdftohtml", "-xml", str(pdf_path), "-stdout"],
@@ -83,7 +70,8 @@ def load_xml(pdf_path: Path) -> ET.Element:
 def collect_page_rows(root: ET.Element) -> list[list[TextItem]]:
     rows: list[list[TextItem]] = []
     global_font_sizes = {
-        font.attrib["id"]: int(font.attrib["size"]) for font in root.findall(".//fontspec")
+        font.attrib["id"]: int(font.attrib["size"])
+        for font in root.findall(".//fontspec")
     }
 
     for page in root.findall("page"):
@@ -101,7 +89,9 @@ def collect_page_rows(root: ET.Element) -> list[list[TextItem]]:
         header_candidates = [
             item
             for item in items
-            if item.text == "Name" and abs(item.left - 170) <= 5 and item.font_size >= 10
+            if item.text == "Name"
+            and abs(item.left - 170) <= 5
+            and item.font_size >= 10
         ]
         if not header_candidates:
             continue
@@ -111,7 +101,9 @@ def collect_page_rows(root: ET.Element) -> list[list[TextItem]]:
             {
                 item.top
                 for item in items
-                if item.top > table_top and item.font_size >= 10 and item.left < TEMP_RANGE_LEFT_MIN + 40
+                if item.top > table_top
+                and item.font_size >= 10
+                and item.left < TEMP_RANGE_LEFT_MIN + 40
             }
         )
         page_rows: dict[int, list[TextItem]] = {top: [] for top in base_tops}
@@ -148,12 +140,23 @@ def join_tokens(items: list[TextItem], *, formula: bool = False) -> str:
 
 def parse_coefficients_and_range(
     items: list[TextItem],
-) -> tuple[tuple[float | None, float | None, float | None, float | None], tuple[float | None, float | None]]:
+) -> tuple[
+    tuple[float | None, float | None, float | None, float | None],
+    tuple[float | None, float | None],
+]:
     tokens: list[str] = []
     for item in sorted(items, key=lambda value: value.left):
         tokens.extend(item.text.split())
-    if len(tokens) >= 3 and re.fullmatch(r"\d+", tokens[-3]) and tokens[-2] == "-" and re.fullmatch(r"\d+", tokens[-1]):
-        range_values = (float(tokens[-3]), float(tokens[-1]))
+    if (
+        len(tokens) >= 3
+        and re.fullmatch(r"\d+", tokens[-3])
+        and tokens[-2] == "-"
+        and re.fullmatch(r"\d+", tokens[-1])
+    ):
+        range_values: tuple[float | None, float | None] = (
+            float(tokens[-3]),
+            float(tokens[-1]),
+        )
         tokens = tokens[:-3]
     else:
         range_values = (None, None)
@@ -162,11 +165,15 @@ def parse_coefficients_and_range(
     return (padded[0], padded[1], padded[2], padded[3]), range_values
 
 
-def parse_dielectric(items: list[TextItem], fallback_base: str | None = None) -> tuple[float, float | None]:
+def parse_dielectric(
+    items: list[TextItem], fallback_base: str | None = None
+) -> tuple[float, float | None]:
     base = join_tokens([item for item in items if item.font_size >= 10])
     if not base and fallback_base is not None:
         base = fallback_base
-    superscript = join_tokens([item for item in items if item.font_size < 10], formula=True)
+    superscript = join_tokens(
+        [item for item in items if item.font_size < 10], formula=True
+    )
     dielectric = float(base)
     if not superscript:
         return dielectric, None
@@ -176,14 +183,10 @@ def parse_dielectric(items: list[TextItem], fallback_base: str | None = None) ->
 def parse_row(items: list[TextItem]) -> ParsedRow | tuple[str, None]:
     name_items = [item for item in items if item.left < NAME_LEFT_MAX]
     formula_items = [
-        item
-        for item in items
-        if FORMULA_LEFT_MIN <= item.left < FORMULA_LEFT_MAX
+        item for item in items if FORMULA_LEFT_MIN <= item.left < FORMULA_LEFT_MAX
     ]
     epsilon_items = [
-        item
-        for item in items
-        if EPSILON_LEFT_MIN <= item.left < EPSILON_LEFT_MAX
+        item for item in items if EPSILON_LEFT_MIN <= item.left < EPSILON_LEFT_MAX
     ]
     right_side_items = [item for item in items if item.left >= COEFFICIENT_LEFT_MIN]
 
@@ -232,26 +235,27 @@ def merge_continuations(rows: list[list[TextItem]]) -> list[ParsedRow]:
     return parsed_rows
 
 
-def make_unique_keys(rows: list[ParsedRow]) -> dict[str, str]:
-    counts: dict[str, int] = {}
-    normalized_keys: dict[str, str] = {}
-    for row in rows:
-        base_key = normalize_name(row.name)
-        counts[base_key] = counts.get(base_key, 0) + 1
-        normalized_keys[row.name] = (
-            base_key if counts[base_key] == 1 else f"{base_key}_{counts[base_key]}"
-        )
-    return normalized_keys
+def assign_keys(rows: list[ParsedRow], output_path: Path) -> dict[str, str]:
+    """Keep keys already in the CSV (they may be hand-edited); propose the rest."""
+    existing: dict[str, str] = {}
+    if output_path.exists():
+        with output_path.open(newline="") as f:
+            existing = {row["name"]: row["key"] for row in csv.DictReader(f)}
+    keys = {row.name: existing.get(row.name) or make_key(row.name) for row in rows}
+    duplicates = [key for key, count in Counter(keys.values()).items() if count > 1]
+    if duplicates:
+        raise ValueError(f"Duplicate keys; edit them by hand: {sorted(duplicates)}")
+    return keys
 
 
 def write_csv(rows: list[ParsedRow], output_path: Path) -> None:
-    normalized_keys = make_unique_keys(rows)
+    keys = assign_keys(rows, output_path)
     with output_path.open("w", newline="") as f:
         writer = csv.DictWriter(
             f,
             fieldnames=[
+                "key",
                 "name",
-                "normalized_key",
                 "formula",
                 "dielectric",
                 "dielectric_temperature_k",
@@ -263,13 +267,14 @@ def write_csv(rows: list[ParsedRow], output_path: Path) -> None:
                 "t_max_k",
                 "sources",
             ],
+            lineterminator="\n",
         )
         writer.writeheader()
         for row in rows:
             writer.writerow(
                 {
+                    "key": keys[row.name],
                     "name": row.name,
-                    "normalized_key": normalized_keys[row.name],
                     "formula": row.formula or "",
                     "dielectric": row.dielectric,
                     "dielectric_temperature_k": (

@@ -25,43 +25,46 @@ python -m pip install qcconst
 
 ## Quickstart
 
-### Constants
+Each dataset in `qcconst` is a collection keyed the same way everywhere:
 
-Each major dataset in `qcconst` is a collection object. The package uses one primary access convention everywhere:
-
-- attribute access uses lowercase normalized Python-safe names
-- mapping access accepts canonical normalized keys and original scientific/source names where appropriate
+- Every entry has exactly one key, stored in the dataset's CSV file: `UPPER_SNAKE_CASE` for constants and solvents, the element symbol (`Ni`) for the periodic table.
+- `collection.KEY` and `collection["KEY"]` are equivalent and are the only ways to look up by key.
+- `collection.by_name(...)` looks an entry up by its original source name, ignoring case.
 
 ### Constants
 
 ```python
 >>> from qcconst import constants
 
->>> constants.bohr_to_angstrom
+>>> constants.BOHR_TO_ANGSTROM
 0.529177210544, unit=Å, uncertainty=8.2e-21, source=https://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0, name=BOHR_TO_ANGSTROM
 
->>> constants["bohr_to_angstrom"]
-0.529177210544, unit=Å, uncertainty=8.2e-21, source=https://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0, name=BOHR_TO_ANGSTROM
+# Use constants just like a float
+>>> constants.BOHR_TO_ANGSTROM * 10
+5.29177210544
 
->>> constants.bohr_to_angstrom.source
+>>> constants["BOHR_TO_ANGSTROM"].source
 'https://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0'
 
 >>> constants.as_list()[:4]
-['bohr_to_angstrom', 'angstrom_to_bohr', 'hartree_to_joule', 'avogadro_number']
+['BOHR_TO_ANGSTROM', 'ANGSTROM_TO_BOHR', 'HARTREE_TO_JOULE', 'AVOGADRO_NUMBER']
+
+# Curated constants can also be imported directly
+>>> from qcconst.constants import HARTREE_TO_EV
 ```
 
 ### All CODATA Physical Constants
 
-The full CODATA 2022 set of constants are available by their NIST-given name at `constants.phys` or `constants.codata2022`. `constants.phys` will always point to the latest CODATA values. Currently this is the 2022 release.
+The full CODATA 2022 set of constants is available at `constants.phys` or `constants.codata2022`. `constants.phys` always points to the latest CODATA release. Keys are the `UPPER_SNAKE_CASE` form of the NIST quantity name; `by_name` accepts the NIST name itself.
 
 ```python
->>> from qcconst import constants
+>>> from qcconst import phys
 
->>> constants.phys['atomic unit of permittivity']
-1.1126500562e-10, unit=kg m s^-1, source=CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt
+>>> phys.SPEED_OF_LIGHT_IN_VACUUM
+299792458.0, unit=m s^-1, uncertainty=0.0, source=CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt, name=speed of light in vacuum
 
->>> constants.codata2022['conventional value of von Klitzing constant']
-25812.807, unit=ohm, source=CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt
+>>> phys.by_name("atomic unit of permittivity")
+1.1126500562e-10, unit=F m^-1, uncertainty=1.7e-20, source=CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt, name=atomic unit of permittivity
 ```
 
 ### Periodic Table
@@ -69,43 +72,33 @@ The full CODATA 2022 set of constants are available by their NIST-given name at 
 ```python
 >>> from qcconst import periodic_table as pt
 
->>> pt.ni
+>>> pt.Ni
 Element(symbol='Ni', number=28, name='Nickel', ...)
 
->>> pt["ni"]
-Element(symbol='Ni', number=28, name='Nickel', ...)
+>>> pt["Ni"] is pt.Ni
+True
 
->>> pt.ni.symbol
-'Ni'
-
->>> pt["Nickel"].number
+>>> pt.by_name("Nickel").number
 28
 ```
 
 ### Solvents
 
+Solvent keys are the `UPPER_SNAKE_CASE` form of the CRC name. A leading locant is moved to the end, following the CAS index convention, so `1,4-Dioxane` is `DIOXANE_1_4`.
+
 ```python
-from qcconst import solvents
+>>> from qcconst import solvents
 
->>> solvents.acetone
+>>> solvents.ACETONE
 Solvent(name='Acetone', formula='C3H6O', dielectric=21.01, dielectric_temperature_k=293.15, ...)
 
->>> solvents["acetone"]
-Solvent(name='Acetone', formula='C3H6O', dielectric=21.01, dielectric_temperature_k=293.15, ...)
-
->>> solvents._1_4_dioxane
+>>> solvents.DIOXANE_1_4
 Solvent(name='1,4-Dioxane', formula='C4H8O2', dielectric=2.2189, dielectric_temperature_k=293.15, ...)
 
->>> solvents["1,4-Dioxane"]
-Solvent(name='1,4-Dioxane', formula='C4H8O2', dielectric=2.2189, dielectric_temperature_k=293.15, ...)
+>>> solvents.by_name("1,4-Dioxane") is solvents.DIOXANE_1_4
+True
 
->>> solvents.acetone.dielectric
-21.01
-
->>> solvents.acetone.dielectric_temperature_k
-293.15
-
->>> solvents.acetone.dielectric_at(298.15)
+>>> solvents.ACETONE.dielectric_at(298.15)
 20.49331470812499
 ```
 

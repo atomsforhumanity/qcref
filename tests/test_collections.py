@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from qcconst.collections import NamedCollection, normalize_name
+from qcconst.collections import Collection
 
 
 @dataclass(frozen=True)
@@ -10,23 +10,34 @@ class Item:
     name: str
 
 
-def test_normalize_name_examples():
-    assert normalize_name("Acetone") == "acetone"
-    assert normalize_name("1,4-dioxane") == "_1_4_dioxane"
-    assert normalize_name("2,2,2-trifluoroethanol") == "_2_2_2_trifluoroethanol"
-    assert normalize_name("N,N-dimethylformamide") == "n_n_dimethylformamide"
-    assert normalize_name("BOHR_TO_ANGSTROM") == "bohr_to_angstrom"
-    assert normalize_name("Ni") == "ni"
-
-
-def test_collection_collision_handling():
-    collection = NamedCollection(
-        [Item("A-B"), Item("A B")],
-        source_name=lambda item: item.name,
+def make(*pairs: tuple[str, str]) -> Collection[Item]:
+    return Collection(
+        ((key, Item(name)) for key, name in pairs), name_of=lambda i: i.name
     )
-    assert collection["A-B"].name == "A-B"
-    assert collection["A B"].name == "A B"
+
+
+def test_attribute_and_item_access_use_the_same_key():
+    collection = make(("A_B", "A-B"))
+    assert collection.A_B is collection["A_B"] is collection.by_name("a-b")
+    assert list(collection) == collection.as_list() == ["A_B"]
+    assert "A_B" in dir(collection)
+    with pytest.raises(KeyError):
+        collection["A-B"]
     with pytest.raises(AttributeError):
         _ = collection.a_b
-    with pytest.raises(KeyError):
-        collection["a_b"]
+
+
+@pytest.mark.parametrize("key", ["lower", "_LEADING", "1ABC", "A-B"])
+def test_invalid_keys_rejected(key):
+    with pytest.raises(ValueError):
+        make((key, "x"))
+
+
+def test_duplicate_keys_rejected():
+    with pytest.raises(ValueError):
+        make(("A", "x"), ("A", "y"))
+
+
+def test_duplicate_names_rejected():
+    with pytest.raises(ValueError):
+        make(("A", "Name"), ("B", "name"))

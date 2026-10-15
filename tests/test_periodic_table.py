@@ -9,20 +9,30 @@ def test_periodic_table_from_pubchem():
 
 
 def test_periodic_table_collection_access():
-    assert pt.ni == pt["ni"] == pt["Ni"] == pt["Nickel"]
-    assert pt.ni.symbol == "Ni"
-    assert "ni" in pt.as_list()
-    assert "Ni" not in dir(pt)
+    assert pt.Ni is pt["Ni"] is pt.by_name("Nickel") is pt.by_name("nickel")
+    assert pt.Ni.symbol == "Ni"
+    assert pt["As"].name == "Arsenic"
+    assert "Ni" in pt.as_list()
+    assert "Ni" in dir(pt)
+
+
+def test_periodic_table_rejects_non_keys():
+    with pytest.raises(AttributeError):
+        _ = pt.ni
+    with pytest.raises(KeyError):
+        pt["Nickel"]
+    with pytest.raises(KeyError):
+        pt.by_name("Ni")
 
 
 def test_group_period_lookup_params():
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         pt.group(0)
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         pt.group(19)
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         pt.period(0)
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         pt.period(8)
 
 

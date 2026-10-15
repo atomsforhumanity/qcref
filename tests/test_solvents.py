@@ -8,9 +8,10 @@ from qcconst.solvents import DielectricFit
 
 
 def test_solvent_collection_access():
-    acetone = solvents.acetone
-    assert acetone == solvents["acetone"] == solvents["Acetone"]
-    assert solvents._1_4_dioxane == solvents["1,4-Dioxane"]
+    acetone = solvents.ACETONE
+    assert acetone is solvents["ACETONE"] is solvents.by_name("acetone")
+    assert solvents.DIOXANE_1_4 is solvents.by_name("1,4-Dioxane")
+    assert solvents.PROPANOL_2.name == "2-Propanol"
     assert acetone.dielectric > 0
     assert acetone.dielectric_temperature_k == 293.15
     assert acetone.sources
@@ -24,13 +25,13 @@ def test_dielectric_fit_evaluation():
 
 
 def test_solvent_temperature_fit_loading():
-    assert solvents.acetone.fit is not None
-    assert solvents.acetone.dielectric_at(298.15, strict=False) == pytest.approx(
+    assert solvents.ACETONE.fit is not None
+    assert solvents.ACETONE.dielectric_at(298.15, strict=False) == pytest.approx(
         20.49331470812499
     )
-    assert solvents.acetaldehyde.fit is None
+    assert solvents.ACETALDEHYDE.fit is None
     with pytest.raises(ValueError):
-        solvents.acetaldehyde.dielectric_at(298.15)
+        solvents.ACETALDEHYDE.dielectric_at(298.15)
 
 
 def test_solvent_csv_schema():
@@ -38,8 +39,8 @@ def test_solvent_csv_schema():
         rows = list(csv.DictReader(f))
     assert rows
     assert {
+        "key",
         "name",
-        "normalized_key",
         "formula",
         "dielectric",
         "dielectric_temperature_k",

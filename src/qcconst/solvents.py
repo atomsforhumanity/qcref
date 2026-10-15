@@ -5,9 +5,9 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
-from .collections import NamedCollection
-from .utils import to_table
+from .collections import Collection
 
 CRC_SOURCE = "CRC Handbook of Chemistry and Physics, Permittivity (Dielectric Constant) of Liquids"
 
@@ -45,25 +45,22 @@ class Solvent:
 
     def dielectric_at(self, T: float, strict: bool = True) -> float:
         if self.fit is None:
-            raise ValueError(f"{self.name} does not have a temperature-dependent dielectric fit.")
+            raise ValueError(
+                f"{self.name} does not have a temperature-dependent dielectric fit."
+            )
         return self.fit.evaluate(T, strict=strict)
 
 
-class SolventCollection(NamedCollection[Solvent]):
-    def show(self) -> None:
-        rows = [
-            {
-                "key": key,
-                "name": solvent.name,
-                "formula": solvent.formula,
-                "dielectric": solvent.dielectric,
-                "temp_k": solvent.dielectric_temperature_k,
-                "fit": "yes" if solvent.fit else "",
-                "source": "; ".join(solvent.sources),
-            }
-            for key, solvent in self.items()
-        ]
-        to_table(rows)
+class SolventCollection(Collection[Solvent]):
+    def _row(self, entry: Solvent) -> dict[str, Any]:
+        return {
+            "name": entry.name,
+            "formula": entry.formula,
+            "dielectric": entry.dielectric,
+            "temp_k": entry.dielectric_temperature_k,
+            "fit": "yes" if entry.fit else "",
+            "source": "; ".join(entry.sources),
+        }
 
 
 def _optional_float(value: str) -> float | None:
@@ -71,9 +68,8 @@ def _optional_float(value: str) -> float | None:
 
 
 def _load_solvents(csv_path: Path) -> SolventCollection:
-    solvent_entries: list[Solvent] = []
-    key_by_id: dict[int, str] = {}
-    with csv_path.open() as f:
+    entries: list[tuple[str, Solvent]] = []
+    with csv_path.open(newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
             fit_values = [
@@ -98,17 +94,14 @@ def _load_solvents(csv_path: Path) -> SolventCollection:
                 name=row["name"],
                 formula=row["formula"] or None,
                 dielectric=float(row["dielectric"]),
-                dielectric_temperature_k=_optional_float(row["dielectric_temperature_k"]),
+                dielectric_temperature_k=_optional_float(
+                    row["dielectric_temperature_k"]
+                ),
                 fit=fit,
                 sources=[s for s in row["sources"].split(";") if s],
             )
-            solvent_entries.append(solvent)
-            key_by_id[id(solvent)] = row["normalized_key"]
-    return SolventCollection(
-        solvent_entries,
-        source_name=lambda solvent: solvent.name,
-        canonical_key=lambda solvent: key_by_id[id(solvent)],
-    )
+            entries.append((row["key"], solvent))
+    return SolventCollection(entries, name_of=lambda solvent: solvent.name)
 
 
 solvents = _load_solvents(Path(__file__).parent / "data" / "solvents.csv")

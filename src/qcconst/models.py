@@ -32,7 +32,12 @@ class Value(float):
         return obj
 
     def __repr__(self):
-        pieces = [str(float(self)), f"unit={self.unit}", f"uncertainty={self.uncertainty}", f"source={self.source}"]
+        pieces = [
+            str(float(self)),
+            f"unit={self.unit}",
+            f"uncertainty={self.uncertainty}",
+            f"source={self.source}",
+        ]
         if self.name:
             pieces.append(f"name={self.name}")
         if self.notes:

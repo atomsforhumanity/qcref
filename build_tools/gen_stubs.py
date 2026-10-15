@@ -26,11 +26,7 @@ header = textwrap.dedent(
     """
 )
 
-uppercase_shims = "\n".join(
-    f"{name}: Value"
-    for name, value in vars(mod).items()
-    if name.isupper() and not name.startswith("_")
-)
+uppercase_shims = "\n".join(f"{key}: Value" for key in mod.constants)
 
 stub = Path(mod.__file__).with_suffix(".pyi")  # type: ignore[arg-type]
 stub.write_text(header + "\n" + uppercase_shims + "\n", encoding="utf-8")

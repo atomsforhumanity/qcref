@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import csv
+import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Any, ClassVar, Optional
 
-from .collections import NamedCollection, normalize_name
+from .collections import Collection
 from .constants import constants
 from .models import Value
-from .utils import to_table
 
 
 @dataclass(frozen=True)
@@ -31,10 +31,12 @@ class Element:
     vdw_radius: Optional[Value]
 
 
-class PeriodicTable(NamedCollection[Element]):
+class PeriodicTable(Collection[Element]):
+    key_pattern: ClassVar[re.Pattern[str]] = re.compile(r"^[A-Z][a-z]{0,2}$")
+
     @classmethod
     def from_data(cls) -> "PeriodicTable":
-        element_data: dict[str, dict[str, object]] = {}
+        element_data: dict[str, dict[str, Any]] = {}
         data_dir = Path(__file__).parent / "data"
 
         with (data_dir / "group_period.csv").open() as file:
@@ -57,8 +59,8 @@ class PeriodicTable(NamedCollection[Element]):
                     sp_row = next(reader)
                     notes = (
                         "Using sp3 hybridized carbon. "
-                        f"sp2 and sp values are {float(sp2_row['cov_radius']) * constants.angstrom_to_bohr} "
-                        f"and {float(sp_row['cov_radius']) * constants.angstrom_to_bohr} Bohr respectively."
+                        f"sp2 and sp values are {float(sp2_row['cov_radius']) * constants.ANGSTROM_TO_BOHR} "
+                        f"and {float(sp_row['cov_radius']) * constants.ANGSTROM_TO_BOHR} Bohr respectively."
                     )
 
                 if "l.s." in symbol:
@@ -66,16 +68,16 @@ class PeriodicTable(NamedCollection[Element]):
                     hs_row = next(reader)
                     notes = (
                         f"Using low spin value for {symbol}. "
-                        f"High spin value is {float(hs_row['cov_radius']) * constants.angstrom_to_bohr} Bohr."
+                        f"High spin value is {float(hs_row['cov_radius']) * constants.ANGSTROM_TO_BOHR} Bohr."
                     )
 
                 element_data[symbol]["cov_radius"] = Value(
-                    float(row["cov_radius"]) * constants.angstrom_to_bohr,
+                    float(row["cov_radius"]) * constants.ANGSTROM_TO_BOHR,
                     unit="Bohr",
                     source="Cordero et al. 2008: https://doi.org/10.1039/b801115j",
                     uncertainty=float(row["est_std_dev"])
                     * 0.01
-                    * constants.angstrom_to_bohr
+                    * constants.ANGSTROM_TO_BOHR
                     if row["est_std_dev"]
                     else None,
                     notes=notes,
@@ -87,7 +89,7 @@ class PeriodicTable(NamedCollection[Element]):
                 symbol = row["symbol"]
                 element_data[symbol]["cov_radius_double"] = (
                     Value(
-                        float(row["r2"]) / 100 * constants.angstrom_to_bohr,
+                        float(row["r2"]) / 100 * constants.ANGSTROM_TO_BOHR,
                         unit="Bohr",
                         source="Pyykkö et al. 2009: https://doi.org/10.1002/chem.200901472",
                         uncertainty=None,
@@ -98,7 +100,7 @@ class PeriodicTable(NamedCollection[Element]):
                 )
                 element_data[symbol]["cov_radius_triple"] = (
                     Value(
-                        float(row["r3"]) / 100 * constants.angstrom_to_bohr,
+                        float(row["r3"]) / 100 * constants.ANGSTROM_TO_BOHR,
                         unit="Bohr",
                         source="Pyykkö et al. 2009: https://doi.org/10.1002/chem.200901472",
                         uncertainty=None,
@@ -114,7 +116,7 @@ class PeriodicTable(NamedCollection[Element]):
                 symbol = row["symbol"]
                 element_data[symbol]["vdw_radius"] = Value(
                     float(row["vdw_radius"].translate(str.maketrans("", "", "[]")))
-                    * constants.angstrom_to_bohr,
+                    * constants.ANGSTROM_TO_BOHR,
                     unit="Bohr",
                     source="Alvarez 2013: https://doi.org/10.1039/C3DT50599E",
                     uncertainty=None,
@@ -133,17 +135,23 @@ class PeriodicTable(NamedCollection[Element]):
                         number=int(row["AtomicNumber"]),
                         name=row["Name"],
                         mass=Value(row["AtomicMass"], "amu", pubchem_source, None, ""),
-                        group=element_data[symbol]["group"],  # type: ignore[index]
-                        period=element_data[symbol]["period"],  # type: ignore[index]
+                        group=element_data[symbol]["group"],
+                        period=element_data[symbol]["period"],
                         block=row["GroupBlock"],
                         electron_config=row["ElectronConfiguration"],
                         electronegativity=Value(
-                            row["Electronegativity"], "Pauling", pubchem_source, None, ""
+                            row["Electronegativity"],
+                            "Pauling",
+                            pubchem_source,
+                            None,
+                            "",
                         )
                         if row["Electronegativity"]
                         else None,
                         atomic_radius=Value(
-                            float(row["AtomicRadius"]) / 100 * constants.angstrom_to_bohr,
+                            float(row["AtomicRadius"])
+                            / 100
+                            * constants.ANGSTROM_TO_BOHR,
                             "Bohr",
                             pubchem_source,
                             None,
@@ -151,26 +159,26 @@ class PeriodicTable(NamedCollection[Element]):
                         )
                         if row["AtomicRadius"]
                         else None,
-                        cov_radius=element_data[symbol].get("cov_radius"),  # type: ignore[arg-type]
-                        cov_radius_double=element_data[symbol].get("cov_radius_double"),  # type: ignore[arg-type]
-                        cov_radius_triple=element_data[symbol].get("cov_radius_triple"),  # type: ignore[arg-type]
-                        vdw_radius=element_data[symbol].get("vdw_radius"),  # type: ignore[arg-type]
+                        cov_radius=element_data[symbol].get("cov_radius"),
+                        cov_radius_double=element_data[symbol].get("cov_radius_double"),
+                        cov_radius_triple=element_data[symbol].get("cov_radius_triple"),
+                        vdw_radius=element_data[symbol].get("vdw_radius"),
                     )
                 )
 
         return cls(
-            elements,
-            source_name=lambda element: element.symbol,
-            canonical_key=lambda element: normalize_name(element.symbol),
-            aliases=lambda element: [element.name],
+            ((element.symbol, element) for element in elements),
+            name_of=lambda element: element.name,
         )
 
     def group(self, group_number: int) -> list[Element]:
-        assert 1 <= group_number <= 18, "Group number must be between 1 and 18."
+        if not 1 <= group_number <= 18:
+            raise ValueError("Group number must be between 1 and 18.")
         return [element for element in self.values() if element.group == group_number]
 
     def period(self, period_number: int) -> list[Element]:
-        assert 1 <= period_number <= 7, "Period number must be between 1 and 7."
+        if not 1 <= period_number <= 7:
+            raise ValueError("Period number must be between 1 and 7.")
         return [element for element in self.values() if element.period == period_number]
 
     def number(self, number: int) -> Element:
@@ -198,20 +206,14 @@ class PeriodicTable(NamedCollection[Element]):
                 sources.add(element.vdw_radius.source)
         return sorted(sources)
 
-    def show(self) -> None:
-        rows = [
-            {
-                "key": key,
-                "symbol": element.symbol,
-                "name": element.name,
-                "number": element.number,
-                "group": element.group,
-                "period": element.period,
-                "mass": float(element.mass),
-            }
-            for key, element in self.items()
-        ]
-        to_table(rows)
+    def _row(self, entry: Element) -> dict[str, Any]:
+        return {
+            "name": entry.name,
+            "number": entry.number,
+            "group": entry.group,
+            "period": entry.period,
+            "mass": float(entry.mass),
+        }
 
 
 periodic_table = PeriodicTable.from_data()
