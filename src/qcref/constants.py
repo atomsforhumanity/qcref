@@ -23,8 +23,11 @@ if TYPE_CHECKING:
 
 
 class ConstantCollection(Collection[Value]):
+    """Collection of physical constants stored as `Value` objects."""
+
     @property
     def sources(self) -> list[str]:
+        """Distinct sources cited by the constants, sorted."""
         return sorted(
             {source for value in self.values() for source in value.source.split("; ")}
         )

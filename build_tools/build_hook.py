@@ -3,17 +3,18 @@
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from hatchling.plugin import hookimpl
 
 
 class KeysGenHook(BuildHookInterface):
-    def initialize(self, version, build_data):
+    def initialize(self, version: str, build_data: dict[str, Any]) -> None:
         gen = Path(__file__).with_name("gen_keys.py")
         subprocess.check_call([sys.executable, str(gen)])
 
 
 @hookimpl
-def hatch_register_build_hook():
+def hatch_register_build_hook() -> type[KeysGenHook]:
     return KeysGenHook

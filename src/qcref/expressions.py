@@ -8,26 +8,50 @@ order assuming uncorrelated inputs. Number literals are exact.
 from __future__ import annotations
 
 import ast
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from decimal import Decimal
 from math import hypot
-from typing import Optional
 
 from .models import Value
 
 
 @dataclass(frozen=True)
 class Result:
+    """Outcome of evaluating an expression.
+
+    Attributes:
+        value: Computed value.
+        uncertainty: Propagated standard uncertainty, or None if any input's
+            uncertainty is unknown.
+        inputs: Named Values referenced by the expression, in evaluation order
+            and repeated if a name occurs more than once.
+    """
+
     value: float
-    uncertainty: Optional[float]
+    uncertainty: float | None
     inputs: list[Value]
 
 
 def evaluate(expression: str, names: Mapping[str, Value]) -> Result:
+    """Evaluate an arithmetic expression over named Values.
+
+    Args:
+        expression: Expression built from number literals, keys of ``names``,
+            unary + and -, and binary + - * /.
+        names: Values the expression may reference by name.
+
+    Returns:
+        The value, its propagated uncertainty, and the Values referenced.
+
+    Raises:
+        SyntaxError: If the expression cannot be parsed.
+        ValueError: If the expression references an unknown name or uses
+            unsupported syntax.
+    """
     inputs: list[Value] = []
 
-    def ev(node: ast.AST) -> tuple[Decimal, Optional[float]]:
+    def ev(node: ast.AST) -> tuple[Decimal, float | None]:
         if isinstance(node, ast.Constant) and type(node.value) in (int, float):
             return Decimal(str(node.value)), 0.0
         if isinstance(node, ast.Name):
@@ -58,5 +82,7 @@ def evaluate(expression: str, names: Mapping[str, Value]) -> Result:
     return Result(float(value), uncertainty, inputs)
 
 
-def _combine(ua, ub, rule) -> Optional[float]:
+def _combine(
+    ua: float | None, ub: float | None, rule: Callable[[float, float], float]
+) -> float | None:
     return None if ua is None or ub is None else rule(ua, ub)

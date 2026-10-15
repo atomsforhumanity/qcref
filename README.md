@@ -1,12 +1,11 @@
-# QCRef
+# qcref
 
 [![image](https://img.shields.io/pypi/v/qcref.svg)](https://pypi.python.org/pypi/qcref)
 [![image](https://img.shields.io/pypi/l/qcref.svg)](https://pypi.python.org/pypi/qcref)
 [![image](https://img.shields.io/pypi/pyversions/qcref.svg)](https://pypi.python.org/pypi/qcref)
-[![Actions status](https://github.com/atomsforhumanity/qcref/workflows/Tests/badge.svg)](https://github.com/atomsforhumanity/qcref/actions)
-[![Actions status](https://github.com/atomsforhumanity/qcref/workflows/Basic%20Code%20Quality/badge.svg)](https://github.com/atomsforhumanity/qcref/actions)
+[![CI](https://github.com/atomsforhumanity/qcref/actions/workflows/ci.yaml/badge.svg)](https://github.com/atomsforhumanity/qcref/actions/workflows/ci.yaml)
 
-Lightweight, dependency-free reference data for computational chemistry: CODATA physical constants, conversion factors, a periodic table, and solvent permittivities.
+Reference data for computational chemistry: CODATA physical constants, conversion factors, a periodic table, and solvent properties, each value with its source. Lightweight and dependency-free.
 
 - **Every value carries its source.** Each number is a `float` with `.source`, `.unit`, `.uncertainty`, and `.notes`; the package refuses to load a value without a source.
 - **Data releases are versioned.** CODATA releases live side by side (`codata[2022]`), and `phys` and the curated conversion factors always follow the latest.
@@ -125,14 +124,19 @@ Keys are visible to type checkers and IDEs through the generated `src/qcref/_key
 
 Open a PR and that's it! ✨
 
-## The QC Suite of Programs
+## Contributing
 
-The QC Suite works in harmony to provide fast, structured, and interoperable quantum chemistry tools.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, the pre-commit workflow, running tests, and the release process.
 
-- [qcref](https://github.com/atomsforhumanity/qcref) - Lightweight, dependency-free chemistry reference data (CODATA constants, periodic table, solvents) where every value carries its source.
-- [qcdata](https://github.com/atomsforhumanity/qcdata) - Elegant and intuitive data structures for quantum chemistry, featuring seamless Jupyter Notebook visualizations. [Documentation](https://qcdata.docs.atomsforhumanity.org)
-- [qcinf](https://github.com/atomsforhumanity/qcinf) - Cheminformatics algorithms and structure utilities using standardized [qcdata](https://qcdata.docs.atomsforhumanity.org/) data structures.
-- [qccodec](https://github.com/atomsforhumanity/qccodec) - A package for translating between standardized [qcdata](https://github.com/atomsforhumanity/qcdata) data structures and native QC program inputs and outputs.
-- [qccompute](https://github.com/atomsforhumanity/qccompute) - A package for operating quantum chemistry programs using standardized [qcdata](https://qcdata.docs.atomsforhumanity.org/) data structures. Compatible with `TeraChem`, `psi4`, `QChem`, `NWChem`, `ORCA`, `Molpro`, `geomeTRIC` and many more.
-- [BigChem](https://github.com/mtzgroup/bigchem) - A distributed application for running quantum chemistry calculations at scale across clusters of computers or the cloud. Bring multi-node scaling to your favorite quantum chemistry program.
-- `ChemCloud` - A [web application](https://github.com/mtzgroup/chemcloud-server) and associated [Python client](https://github.com/mtzgroup/chemcloud-client) for exposing a BigChem cluster securely over the internet.
+## The QC Suite
+
+These packages work together to make quantum chemistry fast, structured, and interoperable.
+
+- [qcref](https://github.com/atomsforhumanity/qcref) - Reference data for computational chemistry: CODATA physical constants, conversion factors, a periodic table, and solvent properties, each value with its source.
+- [qcdata](https://github.com/atomsforhumanity/qcdata) - Data structures for quantum chemistry inputs and results, with Jupyter visualizations. [Documentation](https://qcdata.docs.atomsforhumanity.org)
+- [qcinf](https://github.com/atomsforhumanity/qcinf) - Cheminformatics algorithms and structure utilities for [qcdata](https://github.com/atomsforhumanity/qcdata) structures.
+- [qccodec](https://github.com/atomsforhumanity/qccodec) - Translates [qcdata](https://github.com/atomsforhumanity/qcdata) inputs into native program inputs and parses program outputs back into qcdata objects, one codec per program.
+- [qccompute](https://github.com/atomsforhumanity/qccompute) - Runs quantum chemistry programs on [qcdata](https://github.com/atomsforhumanity/qcdata) inputs using [qccodec](https://github.com/atomsforhumanity/qccodec) codecs and returns structured results. [Documentation](https://qccompute.docs.atomsforhumanity.org)
+- [BigChem](https://github.com/mtzgroup/bigchem) - Distributed execution of qccompute calculations across clusters of computers or the cloud.
+- [ChemCloud](https://github.com/mtzgroup/chemcloud-client) - A [web application](https://github.com/mtzgroup/chemcloud-server) and [Python client](https://github.com/mtzgroup/chemcloud-client) that expose a BigChem cluster securely over the internet.
+
