@@ -1,15 +1,21 @@
-"""Physical constants from NIST CODATA 2022 and related sources."""
+"""Physical constants from NIST CODATA and curated conversion factors.
+
+CODATA releases are discovered from `data/codata/<year>.csv`; `phys` is the latest.
+Curated constants in `data/constants/constants.csv` are expressions evaluated
+against the latest release, so a new CODATA release updates them automatically.
+"""
 
 from __future__ import annotations
 
-import csv
-from pathlib import Path
+from collections import ChainMap
+from collections.abc import Mapping
+from types import MappingProxyType
 from typing import Any
 
 from .collections import Collection
+from .datasets import DATA_DIR, dataset_paths, load_dataset
+from .expressions import evaluate
 from .models import Value
-
-_DATA_DIR = Path(__file__).parent / "data"
 
 
 class ConstantCollection(Collection[Value]):
@@ -19,11 +25,7 @@ class ConstantCollection(Collection[Value]):
     @property
     def sources(self) -> list[str]:
         return sorted(
-            {
-                value.source
-                for value in self.values()
-                if not value.source.startswith("Derived")
-            }
+            {source for value in self.values() for source in value.source.split("; ")}
         )
 
     def _row(self, entry: Value) -> dict[str, Any]:
@@ -36,69 +38,82 @@ class ConstantCollection(Collection[Value]):
         }
 
 
-def _load_constants(csv_path: Path) -> ConstantCollection:
-    with csv_path.open(newline="") as f:
-        entries = [
+def _codata_float(value: str) -> float:
+    """Handle CODATA's digit-group spaces and ellipses."""
+    return float(value.replace(" ", "").replace("...", ""))
+
+
+def _load_codata() -> dict[int, ConstantCollection]:
+    releases = {}
+    for path in dataset_paths("codata"):
+        dataset = load_dataset(path)
+        releases[int(path.stem)] = ConstantCollection(
             (
-                row["key"],
-                Value(
-                    row["value"],
-                    row["unit"],
-                    row["source"],
-                    float(row["uncertainty"]) if row["uncertainty"] else None,
-                    row["notes"],
-                    name=row["key"],
-                ),
-            )
-            for row in csv.DictReader(f)
-        ]
-    return ConstantCollection(entries, name_of=lambda value: value.name)
+                (
+                    row["key"],
+                    Value(
+                        _codata_float(row["value"]),
+                        row["unit"],
+                        dataset.source,
+                        0.0
+                        if row["uncertainty"] == "(exact)"
+                        else _codata_float(row["uncertainty"]),
+                        "",
+                        name=row["quantity"],
+                    ),
+                )
+                for row in dataset.rows
+            ),
+            name_of=lambda value: value.name,
+        )
+    return releases
 
 
-def _load_codata(year: int) -> ConstantCollection:
-    source = f"CODATA {year}: https://physics.nist.gov/cuu/Constants/Table/allascii.txt"
+def _load_constants(codata: Mapping[str, Value]) -> ConstantCollection:
+    dataset = load_dataset(DATA_DIR / "constants" / "constants.csv")
+    defined: dict[str, Value] = {}
+    names = ChainMap(defined, dict(codata))
+    for row in dataset.rows:
+        expression = row["expression"]
+        result = evaluate(expression, names)
+        source = row["source"] or "; ".join(
+            dict.fromkeys(value.source for value in result.inputs)
+        )
+        if not source:
+            raise ValueError(f"{row['key']}: a literal value needs a source column.")
+        notes = [row["notes"]] if row["notes"] else []
+        if result.inputs:
+            notes.append(f"Computed as {expression}.")
+        defined[row["key"]] = Value(
+            result.value,
+            row["unit"],
+            source,
+            result.uncertainty,
+            " ".join(notes),
+            name=row["key"],
+        )
+    return ConstantCollection(defined.items(), name_of=lambda value: value.name)
 
-    def _process_float(value: str) -> float:
-        """Handle CODATA's spaces and ellipses in float values."""
-        return float(value.replace(" ", "").replace("...", ""))
 
-    with (_DATA_DIR / f"codata{year}.csv").open(newline="") as f:
-        entries = [
-            (
-                row["key"],
-                Value(
-                    _process_float(row["value"]),
-                    row["unit"],
-                    source,
-                    _process_float(row["uncertainty"])
-                    if row["uncertainty"] != "(exact)"
-                    else 0.0,
-                    "",
-                    name=row["quantity"],
-                ),
-            )
-            for row in csv.DictReader(f)
-        ]
-    return ConstantCollection(entries, name_of=lambda value: value.name)
-
-
-constants = _load_constants(_DATA_DIR / "constants.csv")
-codata2022 = _load_codata(2022)
-phys = codata2022
-constants.codata2022 = codata2022
+codata: Mapping[int, ConstantCollection] = MappingProxyType(_load_codata())
+phys = codata[max(codata)]
+constants = _load_constants(phys)
 constants.phys = phys
+for _year, _release in codata.items():
+    setattr(constants, f"codata{_year}", _release)
 
 
-def __getattr__(key: str) -> Value:
-    """Expose curated constants as module attributes: `from qcconst.constants import X`."""
-    try:
+def __getattr__(key: str) -> Any:
+    """Expose curated constants and `codataYYYY` releases as module attributes."""
+    if key in constants:
         return constants[key]
-    except KeyError:
-        raise AttributeError(f"module {__name__!r} has no attribute {key!r}") from None
+    if key.startswith("codata") and key[6:].isdigit() and int(key[6:]) in codata:
+        return codata[int(key[6:])]
+    raise AttributeError(f"module {__name__!r} has no attribute {key!r}")
 
 
 def __dir__() -> list[str]:
-    return sorted([*globals(), *constants])
+    return sorted([*globals(), *constants, *(f"codata{year}" for year in codata)])
 
 
-__all__ = ["ConstantCollection", "constants", "codata2022", "phys", *constants]
+__all__ = ["ConstantCollection", "codata", "constants", "phys", *constants]

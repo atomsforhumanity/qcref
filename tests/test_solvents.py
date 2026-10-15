@@ -14,7 +14,8 @@ def test_solvent_collection_access():
     assert solvents.PROPANOL_2.name == "2-Propanol"
     assert acetone.dielectric > 0
     assert acetone.dielectric_temperature_k == 293.15
-    assert acetone.sources
+    assert acetone.source.startswith("CRC Handbook")
+    assert acetone.dielectric.source == acetone.source
 
 
 def test_dielectric_fit_evaluation():
@@ -35,7 +36,7 @@ def test_solvent_temperature_fit_loading():
 
 
 def test_solvent_csv_schema():
-    with Path("src/qcconst/data/solvents.csv").open() as f:
+    with Path("src/qcconst/data/solvents/crc.csv").open() as f:
         rows = list(csv.DictReader(f))
     assert rows
     assert {
@@ -50,7 +51,6 @@ def test_solvent_csv_schema():
         "fit_d",
         "t_min_k",
         "t_max_k",
-        "sources",
     } == set(rows[0])
     water = next(row for row in rows if row["name"] == "Water")
     assert water["dielectric_temperature_k"] == "293.15"

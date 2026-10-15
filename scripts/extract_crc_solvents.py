@@ -3,7 +3,8 @@
 
 This script relies on the `pdftohtml` CLI from poppler because the XML output
 preserves the superscript temperature attached to the tabulated dielectric
-constant. The generated CSV is written to `src/qcconst/data/solvents.csv`.
+constant. The generated CSV is written to `src/qcconst/data/solvents/crc.csv`; its
+source citation lives in the sibling `crc.meta.json`.
 """
 
 from __future__ import annotations
@@ -20,8 +21,7 @@ from keys import make_key
 
 ROOT = Path(__file__).resolve().parents[1]
 PDF_PATH = ROOT / "CRC Solvent Data.pdf"
-OUTPUT_PATH = ROOT / "src" / "qcconst" / "data" / "solvents.csv"
-CRC_SOURCE = "CRC Handbook of Chemistry and Physics, Permittivity (Dielectric Constant) of Liquids"
+OUTPUT_PATH = ROOT / "src" / "qcconst" / "data" / "solvents" / "crc.csv"
 
 NAME_LEFT_MAX = 300
 FORMULA_LEFT_MIN = 300
@@ -265,7 +265,6 @@ def write_csv(rows: list[ParsedRow], output_path: Path) -> None:
                 "fit_d",
                 "t_min_k",
                 "t_max_k",
-                "sources",
             ],
             lineterminator="\n",
         )
@@ -288,7 +287,6 @@ def write_csv(rows: list[ParsedRow], output_path: Path) -> None:
                     "fit_d": row.fit_d if row.fit_d is not None else "",
                     "t_min_k": row.t_min_k if row.t_min_k is not None else "",
                     "t_max_k": row.t_max_k if row.t_max_k is not None else "",
-                    "sources": CRC_SOURCE,
                 }
             )
 

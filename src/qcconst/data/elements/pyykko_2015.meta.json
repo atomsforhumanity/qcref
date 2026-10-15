@@ -1,0 +1,10 @@
+{
+  "source": "Pyykkö 2015: https://doi.org/10.1021/jp5065819",
+  "citation": "P. Pyykkö. Additive Covalent Radii for Single-, Double-, and Triple-Bonded Molecules and Tetrahedrally Bonded Crystals: A Summary. J. Phys. Chem. A 2015, 119, 2326-2337.",
+  "notes": "r1, r2, r3 are single-, double-, and triple-bond radii fitted as one self-consistent set; compare bond orders within this set.",
+  "columns": {
+    "r1": {"unit": "pm"},
+    "r2": {"unit": "pm"},
+    "r3": {"unit": "pm"}
+  }
+}

@@ -1,0 +1,10 @@
+key,expression,unit,source,notes
+BOHR_TO_ANGSTROM,BOHR_RADIUS * 1e10,Å,,
+ANGSTROM_TO_BOHR,1 / BOHR_TO_ANGSTROM,Bohr,,
+HARTREE_TO_JOULE,HARTREE_JOULE_RELATIONSHIP,J,,
+AVOGADRO_NUMBER,AVOGADRO_CONSTANT,mol⁻¹,,
+KCAL_TO_JOULE,4184,J,NIST SP 811 Appendix B.8: https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8,Using kcal(th) because Thermochemical calorie is the unit used in quantum chemistry.
+HARTREE_TO_KCAL_PER_MOL,HARTREE_TO_JOULE * AVOGADRO_NUMBER / KCAL_TO_JOULE,kcal/mol,,
+BOLTZMANN_CONSTANT,BOLTZMANN_CONSTANT,J/K,,
+HARTREE_TO_EV,HARTREE_ENERGY_IN_EV,eV,,
+EV_TO_HARTREE,ELECTRON_VOLT_HARTREE_RELATIONSHIP,Ha,,

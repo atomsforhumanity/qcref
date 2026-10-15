@@ -14,8 +14,8 @@ Each piece of data contains a link to its source. Primary data sources include:
 | Data Name | Source | Source Links |
 | -------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Physical Constants` | NIST 2022 CODATA | [Individual Constant Lookup](http://physics.nist.gov/constants), [Fundamenal Constants Listing](https://physics.nist.gov/cuu/Constants/Table/allascii.txt), [Conversion Factors](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8) |
-| `Periodic Table` | PubChem, Cordero 2008, Pyykkö 2009, Alvarez 2013 | [Periodic Table](https://pubchem.ncbi.nlm.nih.gov/periodic-table/), [Raw CSV Data](https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/CSV?response_type=save&response_basename=PubChemElements_all), [Cordero 2008](https://doi.org/10.1039/b801115j), [Pyykkö 2009](https://doi.org/10.1002/chem.200901472), [Alvarez 2013](https://doi.org/10.1039/C3DT50599E) |
-| `Solvent Data` | CRC Handbook of Chemistry and Physics | `CRC Solvent Data.pdf` in the repository root |
+| `Periodic Table` | PubChem, IUPAC, Cordero 2008, Pyykkö 2015, Alvarez 2013 | [Periodic Table](https://pubchem.ncbi.nlm.nih.gov/periodic-table/), [Raw CSV Data](https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/CSV?response_type=save&response_basename=PubChemElements_all), [IUPAC Periodic Table](https://iupac.org/what-we-do/periodic-table-of-elements/), [Cordero 2008](https://doi.org/10.1039/b801115j), [Pyykkö 2015](https://doi.org/10.1021/jp5065819), [Alvarez 2013](https://doi.org/10.1039/C3DT50599E) |
+| `Solvent Data` | CRC Handbook of Chemistry and Physics | Permittivity (Dielectric Constant) of Liquids, C. Wohlfarth |
 
 ## Installation
 
@@ -30,6 +30,7 @@ Each dataset in `qcconst` is a collection keyed the same way everywhere:
 - Every entry has exactly one key, stored in the dataset's CSV file: `UPPER_SNAKE_CASE` for constants and solvents, the element symbol (`Ni`) for the periodic table.
 - `collection.KEY` and `collection["KEY"]` are equivalent and are the only ways to look up by key.
 - `collection.by_name(...)` looks an entry up by its original source name, ignoring case.
+- Every value carries `.source`, `.unit`, `.uncertainty`, and `.notes`.
 
 ### Constants
 
@@ -37,14 +38,14 @@ Each dataset in `qcconst` is a collection keyed the same way everywhere:
 >>> from qcconst import constants
 
 >>> constants.BOHR_TO_ANGSTROM
-0.529177210544, unit=Å, uncertainty=8.2e-21, source=https://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0, name=BOHR_TO_ANGSTROM
+0.529177210544, unit=Å, uncertainty=8.2e-11, source=CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt, name=BOHR_TO_ANGSTROM, notes=Computed as BOHR_RADIUS * 1e10.
 
 # Use constants just like a float
 >>> constants.BOHR_TO_ANGSTROM * 10
 5.29177210544
 
 >>> constants["BOHR_TO_ANGSTROM"].source
-'https://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0'
+'CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt'
 
 >>> constants.as_list()[:4]
 ['BOHR_TO_ANGSTROM', 'ANGSTROM_TO_BOHR', 'HARTREE_TO_JOULE', 'AVOGADRO_NUMBER']
@@ -55,7 +56,7 @@ Each dataset in `qcconst` is a collection keyed the same way everywhere:
 
 ### All CODATA Physical Constants
 
-The full CODATA 2022 set of constants is available at `constants.phys` or `constants.codata2022`. `constants.phys` always points to the latest CODATA release. Keys are the `UPPER_SNAKE_CASE` form of the NIST quantity name; `by_name` accepts the NIST name itself.
+Every CODATA release in the package is available as `codata[<year>]` (also `constants.codata2022`, ...). `phys` always points to the latest release, currently 2022. Keys are the `UPPER_SNAKE_CASE` form of the NIST quantity name; `by_name` accepts the NIST name itself.
 
 ```python
 >>> from qcconst import phys
@@ -106,7 +107,15 @@ The solvent dataset is generated from the CRC permittivity table. `dielectric` i
 
 ## Adding New Values
 
-Adding new values is simple! Just add it to one of the `.csv` files in [src/qcconst/data](https://github.com/coltonbh/qcconst/tree/master/src/qcconst/data). Include the value, its source, and any other required metadata and then open a PR. That's it! ✨
+All data live in CSV files under [src/qcconst/data](https://github.com/coltonbh/qcconst/tree/master/src/qcconst/data), one folder per dataset. Adding data never requires a code change:
+
+- **New entries:** add a row to the dataset's CSV, including its `key`. Keys are `UPPER_SNAKE_CASE` (element symbols for the periodic table) and must be unique; the package refuses to import otherwise.
+- **New CODATA release:** add `data/codata/<year>.csv` and `<year>.meta.json`. `phys` and every curated constant in `data/constants/constants.csv` automatically use the latest release, and older releases stay available as `codata[<year>]`.
+- **New curated constants:** add a row to `data/constants/constants.csv` with an `expression` over CODATA keys or earlier rows (e.g. `BOHR_RADIUS * 1e10`). Value, uncertainty, and source are computed from the inputs.
+
+Every CSV has a `<name>.meta.json` sidecar with a required `source` (plus optional `citation`, `notes`, and per-column `units`). Values are stored exactly as published; conversions such as Å to Bohr happen at load time and are recorded in each value's `notes`. Every loaded value must have a source.
+
+Open a PR and that's it! ✨
 
 ## The QC Suite of Programs
 

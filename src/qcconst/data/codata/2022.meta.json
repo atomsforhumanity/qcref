@@ -1,0 +1,5 @@
+{
+  "source": "CODATA 2022: https://physics.nist.gov/cuu/Constants/Table/allascii.txt",
+  "citation": "E. Tiesinga, P. J. Mohr, D. B. Newell, B. N. Taylor, and the NIST team. CODATA Internationally Recommended 2022 Values of the Fundamental Physical Constants. NIST Standard Reference Database 121.",
+  "notes": "Values and uncertainties are as printed by NIST, including digit-group spaces and '...' for truncated exact values. '(exact)' uncertainties load as 0.0."
+}

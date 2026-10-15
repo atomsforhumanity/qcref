@@ -1,0 +1,10 @@
+{
+  "source": "Alvarez 2013: https://doi.org/10.1039/C3DT50599E",
+  "citation": "S. Alvarez. A cartography of the van der Waals territories. Dalton Trans. 2013, 42, 8617-8636.",
+  "notes": "Some vdw_radius values are printed in square brackets in the source table; the brackets are kept in the CSV and noted on the loaded value.",
+  "columns": {
+    "bondi": {"unit": "Å"},
+    "batsanov": {"unit": "Å"},
+    "vdw_radius": {"unit": "Å"}
+  }
+}

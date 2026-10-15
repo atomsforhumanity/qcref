@@ -71,3 +71,30 @@ def test_number_and_sources():
 
 def test_show():
     pt.show()
+
+
+def test_cordero_default_variants():
+    carbon = pt.C.cov_radius
+    assert carbon.source.startswith("Cordero")
+    assert "Using Csp3" in carbon.notes and "Csp2 = 0.73 Å" in carbon.notes
+    assert "Using Mn l.s." in pt.Mn.cov_radius.notes
+    assert "Other values" not in pt.Ni.cov_radius.notes
+
+
+def test_pyykko_bond_order_radii():
+    carbon = pt.C
+    assert (
+        carbon.cov_radius_single > carbon.cov_radius_double > carbon.cov_radius_triple
+    )
+    assert carbon.cov_radius_single.unit == "Bohr"
+    assert carbon.cov_radius_single.source.startswith("Pyykkö 2015")
+    assert "Converted from 75 pm" in carbon.cov_radius_single.notes
+
+
+def test_group_3_convention():
+    assert [e.symbol for e in pt.group(3)] == ["Sc", "Y", "Lu", "Lr"]
+    assert pt.La.group is None
+
+
+def test_sources_cover_all_datasets():
+    assert len(pt.sources) == 5

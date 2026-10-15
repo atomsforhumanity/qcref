@@ -4,8 +4,8 @@ from typing import Optional
 class Value(float):
     """A float subclass holding additional metadata.
 
-    Uncertainty should be set to 0.0 for exact values, None if not applicable or no
-    data is available.
+    Every Value must have a non-empty source. Uncertainty should be set to 0.0 for
+    exact values, None if not applicable or no data is available.
     """
 
     unit: str
@@ -23,6 +23,8 @@ class Value(float):
         notes: str,
         name: str = "",
     ):
+        if not source or not source.strip():
+            raise ValueError("Every Value must have a source.")
         obj = float.__new__(cls, value)
         obj.unit = unit
         obj.source = source

@@ -1,16 +1,26 @@
-"""Periodic table data sourced from PubChem and literature radii tables."""
+"""Periodic table data sourced from PubChem, IUPAC, and literature radii tables.
+
+Radii are stored in the CSVs as published (Å or pm) and converted to Bohr here,
+using the unit declared for each column in the dataset's metadata.
+"""
 
 from __future__ import annotations
 
-import csv
 import re
+from collections import defaultdict
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, ClassVar, Optional
 
 from .collections import Collection
 from .constants import constants
+from .datasets import DATA_DIR, Dataset, load_dataset
 from .models import Value
+
+_ELEMENTS_DIR = DATA_DIR / "elements"
+_BOHR_PER_UNIT = {
+    "Å": constants.ANGSTROM_TO_BOHR,
+    "pm": constants.ANGSTROM_TO_BOHR / 100,
+}
 
 
 @dataclass(frozen=True)
@@ -26,150 +36,136 @@ class Element:
     electronegativity: Optional[Value]
     atomic_radius: Optional[Value]
     cov_radius: Optional[Value]
+    cov_radius_single: Optional[Value]
     cov_radius_double: Optional[Value]
     cov_radius_triple: Optional[Value]
     vdw_radius: Optional[Value]
 
 
+def _value(dataset: Dataset, column: str, raw: str, notes: str = "") -> Optional[Value]:
+    """A Value in the column's published unit, or None if the cell is empty."""
+    if not raw:
+        return None
+    return Value(raw, dataset.unit(column), dataset.source, None, notes)
+
+
+def _bohr(
+    dataset: Dataset,
+    column: str,
+    raw: str,
+    notes: str = "",
+    uncertainty: Optional[float] = None,
+) -> Optional[Value]:
+    """A length in Bohr converted from the column's published unit."""
+    if not raw:
+        return None
+    unit = dataset.unit(column)
+    converted = f"Converted from {raw} {unit}."
+    return Value(
+        float(raw) * _BOHR_PER_UNIT[unit],
+        "Bohr",
+        dataset.source,
+        uncertainty,
+        f"{notes} {converted}" if notes else converted,
+    )
+
+
 class PeriodicTable(Collection[Element]):
     key_pattern: ClassVar[re.Pattern[str]] = re.compile(r"^[A-Z][a-z]{0,2}$")
+    _datasets: list[Dataset]
 
     @classmethod
-    def from_data(cls) -> "PeriodicTable":
-        element_data: dict[str, dict[str, Any]] = {}
-        data_dir = Path(__file__).parent / "data"
+    def from_data(cls) -> PeriodicTable:
+        pubchem, group_period, cordero, pyykko, alvarez = datasets = [
+            load_dataset(_ELEMENTS_DIR / f"{name}.csv")
+            for name in (
+                "pubchem",
+                "group_period",
+                "cordero_2008",
+                "pyykko_2015",
+                "alvarez_2013",
+            )
+        ]
+        positions = {row["Symbol"]: row for row in group_period.rows}
+        pyykko_rows = {row["symbol"]: row for row in pyykko.rows}
+        alvarez_rows = {row["symbol"]: row for row in alvarez.rows}
 
-        with (data_dir / "group_period.csv").open() as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                element_data[row["Symbol"]] = {
-                    "group": int(row["Group"]) if row["Group"] else None,
-                    "period": int(row["Period"]),
-                }
+        cordero_rows: dict[str, list[dict[str, str]]] = defaultdict(list)
+        for row in cordero.rows:
+            cordero_rows[row["element"]].append(row)
 
-        with (data_dir / "covalent_radii_cordero_2008.csv").open() as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                symbol = row["symbol"]
-                notes = ""
+        def cov_radius(symbol: str) -> Optional[Value]:
+            rows = cordero_rows.get(symbol)
+            if not rows:
+                return None
+            (default,) = [row for row in rows if row["default"] == "true"]
+            others = ", ".join(
+                f"{row['label']} = {row['cov_radius']} {cordero.unit('cov_radius')}"
+                for row in rows
+                if row is not default
+            )
+            std_dev = default["est_std_dev"]
+            return _bohr(
+                cordero,
+                "cov_radius",
+                default["cov_radius"],
+                notes=f"Using {default['label']}. Other values in source: {others}."
+                if others
+                else "",
+                uncertainty=float(std_dev) * _BOHR_PER_UNIT[cordero.unit("est_std_dev")]
+                if std_dev
+                else None,
+            )
 
-                if symbol == "Csp3":
-                    symbol = "C"
-                    sp2_row = next(reader)
-                    sp_row = next(reader)
-                    notes = (
-                        "Using sp3 hybridized carbon. "
-                        f"sp2 and sp values are {float(sp2_row['cov_radius']) * constants.ANGSTROM_TO_BOHR} "
-                        f"and {float(sp_row['cov_radius']) * constants.ANGSTROM_TO_BOHR} Bohr respectively."
-                    )
+        def vdw_radius(symbol: str) -> Optional[Value]:
+            row = alvarez_rows.get(symbol)
+            if row is None:
+                return None
+            raw = row["vdw_radius"]
+            notes = [row["notes"]] if row["notes"] else []
+            if raw.startswith("["):
+                notes.append("Value is bracketed in the source table.")
+            return _bohr(alvarez, "vdw_radius", raw.strip("[]"), " ".join(notes))
 
-                if "l.s." in symbol:
-                    symbol = symbol.replace(" l.s.", "")
-                    hs_row = next(reader)
-                    notes = (
-                        f"Using low spin value for {symbol}. "
-                        f"High spin value is {float(hs_row['cov_radius']) * constants.ANGSTROM_TO_BOHR} Bohr."
-                    )
-
-                element_data[symbol]["cov_radius"] = Value(
-                    float(row["cov_radius"]) * constants.ANGSTROM_TO_BOHR,
-                    unit="Bohr",
-                    source="Cordero et al. 2008: https://doi.org/10.1039/b801115j",
-                    uncertainty=float(row["est_std_dev"])
-                    * 0.01
-                    * constants.ANGSTROM_TO_BOHR
-                    if row["est_std_dev"]
-                    else None,
-                    notes=notes,
+        elements = []
+        for row in pubchem.rows:
+            symbol = row["Symbol"]
+            position = positions[symbol]
+            pyykko_row = pyykko_rows.get(symbol, {})
+            elements.append(
+                Element(
+                    symbol=symbol,
+                    number=int(row["AtomicNumber"]),
+                    name=row["Name"],
+                    mass=Value(
+                        row["AtomicMass"],
+                        pubchem.unit("AtomicMass"),
+                        pubchem.source,
+                        None,
+                        "",
+                    ),
+                    group=int(position["Group"]) if position["Group"] else None,
+                    period=int(position["Period"]),
+                    block=row["GroupBlock"],
+                    electron_config=row["ElectronConfiguration"],
+                    electronegativity=_value(
+                        pubchem, "Electronegativity", row["Electronegativity"]
+                    ),
+                    atomic_radius=_bohr(pubchem, "AtomicRadius", row["AtomicRadius"]),
+                    cov_radius=cov_radius(symbol),
+                    cov_radius_single=_bohr(pyykko, "r1", pyykko_row.get("r1", "")),
+                    cov_radius_double=_bohr(pyykko, "r2", pyykko_row.get("r2", "")),
+                    cov_radius_triple=_bohr(pyykko, "r3", pyykko_row.get("r3", "")),
+                    vdw_radius=vdw_radius(symbol),
                 )
+            )
 
-        with (data_dir / "covalent_radii_pyykko_2009.csv").open() as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                symbol = row["symbol"]
-                element_data[symbol]["cov_radius_double"] = (
-                    Value(
-                        float(row["r2"]) / 100 * constants.ANGSTROM_TO_BOHR,
-                        unit="Bohr",
-                        source="Pyykkö et al. 2009: https://doi.org/10.1002/chem.200901472",
-                        uncertainty=None,
-                        notes="",
-                    )
-                    if row["r2"]
-                    else None
-                )
-                element_data[symbol]["cov_radius_triple"] = (
-                    Value(
-                        float(row["r3"]) / 100 * constants.ANGSTROM_TO_BOHR,
-                        unit="Bohr",
-                        source="Pyykkö et al. 2009: https://doi.org/10.1002/chem.200901472",
-                        uncertainty=None,
-                        notes="",
-                    )
-                    if row["r3"]
-                    else None
-                )
-
-        with (data_dir / "vdw_radii_alvarez_2013.csv").open() as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                symbol = row["symbol"]
-                element_data[symbol]["vdw_radius"] = Value(
-                    float(row["vdw_radius"].translate(str.maketrans("", "", "[]")))
-                    * constants.ANGSTROM_TO_BOHR,
-                    unit="Bohr",
-                    source="Alvarez 2013: https://doi.org/10.1039/C3DT50599E",
-                    uncertainty=None,
-                    notes=row["notes"],
-                )
-
-        elements: list[Element] = []
-        with (data_dir / "pubchem.csv").open() as file:
-            reader = csv.DictReader(file)
-            pubchem_source = "PubChem: https://pubchem.ncbi.nlm.nih.gov/periodic-table"
-            for row in reader:
-                symbol = row["Symbol"]
-                elements.append(
-                    Element(
-                        symbol=symbol,
-                        number=int(row["AtomicNumber"]),
-                        name=row["Name"],
-                        mass=Value(row["AtomicMass"], "amu", pubchem_source, None, ""),
-                        group=element_data[symbol]["group"],
-                        period=element_data[symbol]["period"],
-                        block=row["GroupBlock"],
-                        electron_config=row["ElectronConfiguration"],
-                        electronegativity=Value(
-                            row["Electronegativity"],
-                            "Pauling",
-                            pubchem_source,
-                            None,
-                            "",
-                        )
-                        if row["Electronegativity"]
-                        else None,
-                        atomic_radius=Value(
-                            float(row["AtomicRadius"])
-                            / 100
-                            * constants.ANGSTROM_TO_BOHR,
-                            "Bohr",
-                            pubchem_source,
-                            None,
-                            "",
-                        )
-                        if row["AtomicRadius"]
-                        else None,
-                        cov_radius=element_data[symbol].get("cov_radius"),
-                        cov_radius_double=element_data[symbol].get("cov_radius_double"),
-                        cov_radius_triple=element_data[symbol].get("cov_radius_triple"),
-                        vdw_radius=element_data[symbol].get("vdw_radius"),
-                    )
-                )
-
-        return cls(
+        table = cls(
             ((element.symbol, element) for element in elements),
             name_of=lambda element: element.name,
         )
+        table._datasets = datasets
+        return table
 
     def group(self, group_number: int) -> list[Element]:
         if not 1 <= group_number <= 18:
@@ -189,22 +185,7 @@ class PeriodicTable(Collection[Element]):
 
     @property
     def sources(self) -> list[str]:
-        sources = set()
-        for element in self.values():
-            sources.add(element.mass.source)
-            if element.electronegativity:
-                sources.add(element.electronegativity.source)
-            if element.atomic_radius:
-                sources.add(element.atomic_radius.source)
-            if element.cov_radius:
-                sources.add(element.cov_radius.source)
-            if element.cov_radius_double:
-                sources.add(element.cov_radius_double.source)
-            if element.cov_radius_triple:
-                sources.add(element.cov_radius_triple.source)
-            if element.vdw_radius:
-                sources.add(element.vdw_radius.source)
-        return sorted(sources)
+        return sorted(dataset.source for dataset in self._datasets)
 
     def _row(self, entry: Element) -> dict[str, Any]:
         return {
