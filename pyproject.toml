@@ -4,14 +4,13 @@ version = "0.2.1"
 description = "Physical constants, conversion factors, and a periodic table with clear source information for every value."
 readme = "README.md"
 authors = [{ name = "Colton Hicks", email = "github@coltonhicks.com" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = []
 license = { file = "LICENSE" }
 
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Development Status :: 4 - Beta",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -59,7 +58,7 @@ path = "build_tools/build_hook.py"
 [tool.ruff]
 exclude = [".venv"]
 line-length = 88
-target-version = "py39"
+target-version = "py310"
 
 [tool.coverage.run]
 branch = true
