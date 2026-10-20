@@ -1,0 +1,10 @@
+{
+  "source": "mio-1-1 basis definition (dftbparams/mio v1.1.0, mio-1-1-extras/wfc.hsd): https://github.com/dftbparams/mio/releases/tag/v1.1.0",
+  "citation": "mio-1-1 (c) 2017 Marcus Elstner, Karlsruher Institut für Technologie, CC-BY-SA-4.0. Required references, as listed in the README: O-N-C-H: Phys. Rev. B 58 (1998) 7260; S-*: J. Mol. Struc. (THEOCHEM) 541 (2001) 185; P-*: Gaus, Cui, Elstner, J. Chem. Theory Comput. 2011, 7, 931-948.",
+  "notes": "max_angular_momentum is the highest AngularMomentum among each element's orbitals in wfc.hsd, the set's published basis definition (the README does not list them). mio-1-1 is an SCC-DFTB set; its README gives DFTB3 Hubbard derivatives only for P, so hubbard_derivative is empty.",
+  "columns": {
+    "hubbard_derivative": {
+      "unit": "a.u."
+    }
+  }
+}

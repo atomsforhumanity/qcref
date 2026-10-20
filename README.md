@@ -110,6 +110,33 @@ True
 
 The solvent dataset is generated from the CRC permittivity table. `dielectric` is the tabulated static relative permittivity, `dielectric_temperature_k` is the CRC superscript temperature converted from °C to K, and `dielectric_at(T)` evaluates the CRC polynomial fit when one is available.
 
+### DFTB parameter sets
+
+The settings each DFTB Slater-Koster parameter set prescribes for its use: per-element maximum angular momenta and, for DFTB3 sets, Hubbard derivatives and the H-bond damping exponent. Values come from each set's release in the [dftbparams](https://github.com/dftbparams) repositories, which also host the Slater-Koster files themselves (not included here).
+
+```python
+>>> from qcref import dftb_parameter_sets
+
+>>> ob3 = dftb_parameter_sets.by_name("3ob-3-1")  # or dftb_parameter_sets.OB3_3_1
+>>> ob3.model
+'DFTB3'
+
+>>> float(ob3.h_damping_exponent)
+4.0
+
+>>> oxygen = ob3.elements["O"]
+>>> oxygen.max_angular_momentum, float(oxygen.hubbard_derivative)
+('p', -0.1575)
+
+>>> oxygen.hubbard_derivative.source
+'3ob-3-1 README (dftbparams/3ob v3.1.0): https://github.com/dftbparams/3ob/blob/v3.1.0/README'
+
+>>> dftb_parameter_sets.MIO_1_1.url
+'https://github.com/dftbparams/mio/releases/tag/v1.1.0'
+```
+
+Each set's `citation` lists the references its CC-BY-SA-4.0 license requires you to cite.
+
 ## Adding New Values
 
 All data live in CSV files under [src/qcref/data](https://github.com/atomsforhumanity/qcref/tree/master/src/qcref/data), one folder per dataset. Adding data never requires a code change:

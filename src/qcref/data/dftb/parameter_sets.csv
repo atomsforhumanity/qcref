@@ -1,0 +1,3 @@
+key,name,version,model,h_damping_exponent,url,license
+OB3_3_1,3ob-3-1,3.1.0,DFTB3,4.00,https://github.com/dftbparams/3ob/releases/tag/v3.1.0,CC-BY-SA-4.0
+MIO_1_1,mio-1-1,1.1.0,SCC-DFTB,,https://github.com/dftbparams/mio/releases/tag/v1.1.0,CC-BY-SA-4.0

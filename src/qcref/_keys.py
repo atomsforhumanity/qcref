@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .constants import CodataCollection
+    from .dftb import DFTBParameterSet
     from .models import Value
     from .periodic_table import Element
     from .solvents import Solvent
@@ -1833,3 +1834,8 @@ class SolventKeys:
     XYLENOL_3_4: Solvent
     XYLENOL_3_5: Solvent
     XYLITOL: Solvent
+
+
+class DFTBParameterSetKeys:
+    OB3_3_1: DFTBParameterSet
+    MIO_1_1: DFTBParameterSet
