@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.4.1] - 2026-10-20
+
 ### Changed
 
 - The README's Data Sources table lists the DFTB parameter sets.
@@ -102,7 +104,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Core physical constants, periodic table, and solvent properties.
 - Common API for showing available constants and solvents.
 
-[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.4.0...HEAD
+[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.4.1...HEAD
+[0.4.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.4.1
 [0.4.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.4.0
 [0.3.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.3.0
 [0.2.2]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.2
