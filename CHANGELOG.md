@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+### Changed
+
+- The README's Data Sources table lists the DFTB parameter sets.
+
 ## [0.4.0] - 2026-10-20
 
 ### Added

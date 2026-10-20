@@ -21,6 +21,7 @@ Each piece of data contains a link to its source. Primary data sources include:
 | `Physical Constants` | NIST 2022 CODATA | [Individual Constant Lookup](http://physics.nist.gov/constants), [Fundamenal Constants Listing](https://physics.nist.gov/cuu/Constants/Table/allascii.txt), [Conversion Factors](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8) |
 | `Periodic Table` | PubChem, IUPAC, Cordero 2008, Pyykkö 2015, Alvarez 2013 | [Periodic Table](https://pubchem.ncbi.nlm.nih.gov/periodic-table/), [Raw CSV Data](https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/CSV?response_type=save&response_basename=PubChemElements_all), [IUPAC Periodic Table](https://iupac.org/what-we-do/periodic-table-of-elements/), [Cordero 2008](https://doi.org/10.1039/b801115j), [Pyykkö 2015](https://doi.org/10.1021/jp5065819), [Alvarez 2013](https://doi.org/10.1039/C3DT50599E) |
 | `Solvent Data` | CRC Handbook of Chemistry and Physics | Permittivity (Dielectric Constant) of Liquids, C. Wohlfarth |
+| `DFTB Parameter Sets` | dftbparams parameter-set releases (3ob-3-1 v3.1.0, mio-1-1 v1.1.0) | [dftbparams](https://github.com/dftbparams), [3ob-3-1 README](https://github.com/dftbparams/3ob/blob/v3.1.0/README), [mio-1-1 release](https://github.com/dftbparams/mio/releases/tag/v1.1.0) |
 
 ## Installation
 
@@ -32,7 +33,7 @@ python -m pip install qcref
 
 Each dataset in `qcref` is a collection keyed the same way everywhere:
 
-- Every entry has exactly one key, stored in the dataset's CSV file: `UPPER_SNAKE_CASE` for constants and solvents, the element symbol (`Ni`) for the periodic table.
+- Every entry has exactly one key, stored in the dataset's CSV file: `UPPER_SNAKE_CASE` for constants, solvents, and DFTB parameter sets, the element symbol (`Ni`) for the periodic table.
 - `collection.KEY` and `collection["KEY"]` are equivalent and are the only ways to look up by key.
 - `collection.by_name(...)` looks an entry up by its original source name, ignoring case.
 - Every value carries `.source`, `.unit`, `.uncertainty`, and `.notes`.
