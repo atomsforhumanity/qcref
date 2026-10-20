@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.4.0] - 2026-10-20
+
 ### Added
 
 - `dftb_parameter_sets`: the settings DFTB Slater-Koster parameter sets prescribe for their use, keyed `OB3_3_1` and `MIO_1_1` (or `by_name("3ob-3-1")`). Each set records its model (DFTB3 or SCC-DFTB), release, download URL, license, the citation its license requires, the H-bond damping exponent (3ob), and per-element maximum angular momenta and DFTB3 Hubbard derivatives. Values come from each set's release in the dftbparams GitHub repositories; the Slater-Koster files themselves are not included.
@@ -96,7 +98,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Core physical constants, periodic table, and solvent properties.
 - Common API for showing available constants and solvents.
 
-[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.3.0...HEAD
+[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.4.0
 [0.3.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.3.0
 [0.2.2]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.2
 [0.2.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.2.1
