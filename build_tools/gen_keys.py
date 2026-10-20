@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .constants import CodataCollection
+    from .dftb import DFTBParameterSet
     from .models import Value
     from .periodic_table import Element
     from .solvents import Solvent
@@ -39,7 +40,13 @@ def _keys_class(name: str, keys: list[str], type_name: str) -> str:
     return f"\n\nclass {name}:\n{body}"
 
 
-KEY_CLASSES = ("ConstantKeys", "CodataKeys", "PeriodicTableKeys", "SolventKeys")
+KEY_CLASSES = (
+    "ConstantKeys",
+    "CodataKeys",
+    "PeriodicTableKeys",
+    "SolventKeys",
+    "DFTBParameterSetKeys",
+)
 
 
 def render() -> str:
@@ -54,6 +61,7 @@ def render() -> str:
     constants = importlib.import_module("qcref.constants")
     periodic_table = importlib.import_module("qcref.periodic_table").periodic_table
     solvents = importlib.import_module("qcref.solvents").solvents
+    dftb_parameter_sets = importlib.import_module("qcref.dftb").dftb_parameter_sets
 
     curated = list(constants.constants)
     releases = [f"codata{year}" for year in constants.codata]
@@ -72,6 +80,9 @@ def render() -> str:
         + _keys_class("CodataKeys", list(constants.phys), "Value")
         + _keys_class("PeriodicTableKeys", list(periodic_table), "Element")
         + _keys_class("SolventKeys", list(solvents), "Solvent")
+        + _keys_class(
+            "DFTBParameterSetKeys", list(dftb_parameter_sets), "DFTBParameterSet"
+        )
     )
 
 

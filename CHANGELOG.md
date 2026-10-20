@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+### Added
+
+- `dftb_parameter_sets`: the settings DFTB Slater-Koster parameter sets prescribe for their use, keyed `OB3_3_1` and `MIO_1_1` (or `by_name("3ob-3-1")`). Each set records its model (DFTB3 or SCC-DFTB), release, download URL, license, the citation its license requires, the H-bond damping exponent (3ob), and per-element maximum angular momenta and DFTB3 Hubbard derivatives. Values come from each set's release in the dftbparams GitHub repositories; the Slater-Koster files themselves are not included.
+
 ### Changed
 
 - Development tooling: shared ruff (including Google docstring rules), mypy (fully typed library code), and pytest settings; pre-commit hooks that run the locked tools through `uv run`; one CI workflow; a tag-driven release workflow with `scripts/prepare_release.py` and an approval-gated PyPI deployment. Added CONTRIBUTING.md and AGENTS.md.

@@ -1,0 +1,10 @@
+{
+  "source": "3ob-3-1 README (dftbparams/3ob v3.1.0): https://github.com/dftbparams/3ob/blob/v3.1.0/README",
+  "citation": "3ob-3-1 (c) 2017 Marcus Elstner, Karlsruher Institut für Technologie, CC-BY-SA-4.0. Required references, as listed in the README: O-N-C-H: J. Chem. Theory Comput., 2013, 9, 338-354; P,S-*: J. Chem. Theory Comput., 2014, 10, 1518-1537; Mg,Zn-*: J. Phys. Chem. B, 2015, 119, 1062-1082; Na,F,K,Ca,Cl,Br,I-*: J. Chem. Theory Comput., 2015, 11, 332-342.",
+  "notes": "Maximum angular momenta and atomic Hubbard derivatives exactly as listed in the README for DFTB3/3OB input files.",
+  "columns": {
+    "hubbard_derivative": {
+      "unit": "a.u."
+    }
+  }
+}

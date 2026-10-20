@@ -1,0 +1,7 @@
+{
+  "source": "dftbparams parameter-set releases, README of each set: https://github.com/dftbparams",
+  "notes": "One row per Slater-Koster parameter set. model is the DFTB Hamiltonian the set was parametrized for, as its README states (3ob: third-order DFTB3; mio: self-consistent-charge SCC-DFTB). h_damping_exponent is the gamma^h damping exponent zeta the 3ob README prescribes for DFTB3/3OB (DampXHExponent in DFTB+); empty for sets that use no H-bond damping. The Slater-Koster files themselves are not included; download them from url.",
+  "columns": {
+    "h_damping_exponent": {"unit": ""}
+  }
+}

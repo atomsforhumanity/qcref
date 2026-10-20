@@ -1,2 +1,6 @@
 [files]
 extend-exclude = ["src/qcref/data/**", "src/qcref/_keys.py", "tests/test_periodic_table.py"]
+
+[default.extend-words]
+# "J. Chem. Theory Comput." (journal abbreviation in citations)
+Comput = "Comput"
