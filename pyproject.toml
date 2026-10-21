@@ -1,6 +1,6 @@
 [project]
 name = "qcref"
-version = "0.5.0"
+version = "0.5.1"
 description = "Lightweight, dependency-free chemistry reference data (CODATA constants, periodic table, solvents) where every value carries its source."
 readme = "README.md"
 authors = [{ name = "Colton Hicks", email = "github@coltonhicks.com" }]

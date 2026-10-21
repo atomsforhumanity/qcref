@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.5.1] - 2026-10-21
+
 ### Added
 
 - Supports Python 3.15; CI tests the oldest (3.11) and newest (3.15) supported versions.
@@ -114,7 +116,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Core physical constants, periodic table, and solvent properties.
 - Common API for showing available constants and solvents.
 
-[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.5.0...HEAD
+[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.5.1...HEAD
+[0.5.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.5.1
 [0.5.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.5.0
 [0.4.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.4.1
 [0.4.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.4.0
