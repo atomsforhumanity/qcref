@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [unreleased]
 
+## [0.5.0] - 2026-10-21
+
 ### Changed
 
 - 🚨 Requires Python 3.11 or newer. Python 3.10 reached end of life in October 2026.
@@ -108,7 +110,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Core physical constants, periodic table, and solvent properties.
 - Common API for showing available constants and solvents.
 
-[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.4.1...HEAD
+[unreleased]: https://github.com/atomsforhumanity/qcref/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.5.0
 [0.4.1]: https://github.com/atomsforhumanity/qcref/releases/tag/0.4.1
 [0.4.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.4.0
 [0.3.0]: https://github.com/atomsforhumanity/qcref/releases/tag/0.3.0
